@@ -14,7 +14,7 @@ DT = 1 / FPS
 GRAVITY = -1000
 FLOOR_HEIGHT = 10
 BACKGROUND_COLOR = "white"
-AIR_MASS = 0.1
+AIR_MASS = 0.5
 LEFT = 0
 RIGHT = 1
 
@@ -41,16 +41,15 @@ def negate_point(p0,p1):
     p0 += p1
     return p0
 
-def draw_velocity_vectors(origin, v, side=LEFT):
+def calc_velocity_vectors(origin, v, side=LEFT):
     origin = Vec2d(*int_point(origin))
     if v[1] > 0:
-        return
+        Vec2d(0,0)
     down_force = origin + Vec2d(*int_point(v))
     lift_force = negate_point(down_force, origin)
     pygame.draw.line(window, "black", translate_coords(origin), translate_coords(lift_force))
+    return 0, lift_force[1] # Hacky shit, canceling X force.
 
-    a = -1 if side == LEFT else 1
-    # bird.body.apply_impulse_at_local_point(lift_force, (a * (BIRD_RECT_WIDTH / 2), BIRD_RECT_HEIGHT/2))
 
 
 
@@ -74,17 +73,23 @@ def run_simulation():
     rotation = 0
 
     while True:
+        window.fill(BACKGROUND_COLOR)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(window, "bird_capture.png")
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
-                bird.left_wing.body.apply_impulse_at_local_point((0,100),(-30,0))
-                bird.right_wing.body.apply_impulse_at_local_point((0,100),(30,0))
+                bird.left_wing.body.apply_impulse_at_local_point((0,300),(-30,0))
+                bird.right_wing.body.apply_impulse_at_local_point((0,300),(30,0))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                 bird.left_wing.body.apply_impulse_at_local_point((0,-100),(-30,0))
                 bird.right_wing.body.apply_impulse_at_local_point((0,-100),(30,0))
+                left_lift = calc_velocity_vectors(bird.left_wing.body.position, (AIR_MASS/DT)*dv_left)
+                right_lift = calc_velocity_vectors(bird.right_wing.body.position,(AIR_MASS/DT)*dv_right)
+                bird.body.apply_impulse_at_local_point(left_lift, (-BIRD_RECT_WIDTH / 2, BIRD_RECT_HEIGHT/2))
+                bird.body.apply_impulse_at_local_point(right_lift, (BIRD_RECT_WIDTH / 2, BIRD_RECT_HEIGHT/2))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 run_physics = not run_physics
 
@@ -130,8 +135,6 @@ def run_simulation():
         window.fill(BACKGROUND_COLOR)
         window.blit(text, (5, 5))
         space.debug_draw(draw_options)
-        draw_velocity_vectors(bird.left_wing.body.position, (AIR_MASS/DT)*dv_left)
-        draw_velocity_vectors(bird.right_wing.body.position,(AIR_MASS/DT)*dv_right)
         pygame.display.update()
         if run_physics:
             space.step(DT)
