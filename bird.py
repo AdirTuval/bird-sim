@@ -26,12 +26,12 @@ class Bird():
 
     def create_left_wing(self, space, x_location):
         self.left_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        c = pymunk.PinJoint(self.body, self.left_wing.body, (-BIRD_RECT_WIDTH/2,BIRD_RECT_HEIGHT/2), (WING_WIDTH/2,0))
+        c = pymunk.PivotJoint(self.body, self.left_wing.body, (-BIRD_RECT_WIDTH/2-5,BIRD_RECT_HEIGHT/2), (WING_WIDTH/2,0))
         space.add(c)
 
     def create_right_wing(self, space, x_location):
         self.right_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        c = pymunk.PinJoint(self.body, self.right_wing.body, (BIRD_RECT_WIDTH/2 ,BIRD_RECT_HEIGHT/2), (-WING_WIDTH/2,0))
+        c = pymunk.PivotJoint(self.body, self.right_wing.body, (BIRD_RECT_WIDTH/2+5 ,BIRD_RECT_HEIGHT/2), (-WING_WIDTH/2,0))
         space.add(c)
 
 
