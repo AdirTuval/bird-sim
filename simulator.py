@@ -9,7 +9,7 @@ pygame.init()
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 DT = 1 / FPS
-GRAVITY = 1000
+GRAVITY = -1000
 FLOOR_HEIGHT = 10
 BACKGROUND_COLOR = "white"
 window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -18,8 +18,8 @@ space = pymunk.Space()
 space.gravity = 0, GRAVITY
 draw_options = pymunk.pygame_util.DrawOptions(window)
 
-bird = Bird(position=(WIDTH/2, HEIGHT-100), space=space)
-floor = Floor(space, WIDTH, HEIGHT)
+bird = Bird(space, WIDTH / 2)
+floor = Floor(space, WIDTH)
 
 def run_simulation():
     while True:
