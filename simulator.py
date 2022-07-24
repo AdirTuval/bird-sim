@@ -23,6 +23,7 @@ def run_simulation():
 
 
         window.fill("white")
+        space.debug_draw(draw_options)
         pygame.display.update()
         space.step(DT)
         clock.tick(FPS)
