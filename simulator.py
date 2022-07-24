@@ -26,6 +26,12 @@ def run_simulation():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                bird.left_wing.body.apply_impulse_at_local_point((0,100),(-30,0))
+                bird.right_wing.body.apply_impulse_at_local_point((0,100),(30,0))
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                bird.left_wing.body.apply_impulse_at_local_point((0,-100),(-30,0))
+                bird.right_wing.body.apply_impulse_at_local_point((0,-100),(30,0))
 
 
         window.fill(BACKGROUND_COLOR)

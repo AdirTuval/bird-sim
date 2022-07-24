@@ -1,5 +1,5 @@
 import pymunk
-from pymunk import Vec2d
+import math
 
 BIRD_RECT_WIDTH = 50
 BIRD_RECT_HEIGHT = 100
@@ -10,6 +10,8 @@ BIRD_OPACITY = 100
 BIRD_COLOR = 255, 0 ,0, BIRD_OPACITY
 WING_WIDTH = 60
 WING_MASS = 1
+BIRD_WING_OFFSET = 10
+PI = math.pi
 
 class Bird():
     def __init__(self, space, x_location) -> None:
@@ -26,13 +28,17 @@ class Bird():
 
     def create_left_wing(self, space, x_location):
         self.left_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        c = pymunk.PivotJoint(self.body, self.left_wing.body, (-BIRD_RECT_WIDTH/2-5,BIRD_RECT_HEIGHT/2), (WING_WIDTH/2,0))
-        space.add(c)
+        constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body, (-BIRD_RECT_WIDTH/2-BIRD_WING_OFFSET,BIRD_RECT_HEIGHT/2), (WING_WIDTH/2,0))
+        limit_left = pymunk.RotaryLimitJoint(self.body, self.left_wing.body, -PI/2,PI)
+        space.add(limit_left)
+        space.add(constraint_left)
 
     def create_right_wing(self, space, x_location):
         self.right_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        c = pymunk.PivotJoint(self.body, self.right_wing.body, (BIRD_RECT_WIDTH/2+5 ,BIRD_RECT_HEIGHT/2), (-WING_WIDTH/2,0))
-        space.add(c)
+        constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body, (BIRD_RECT_WIDTH/2+BIRD_WING_OFFSET ,BIRD_RECT_HEIGHT/2), (-WING_WIDTH/2,0))
+        limit_right = pymunk.RotaryLimitJoint(self.body, self.right_wing.body, -PI,PI/2)
+        space.add(limit_right)
+        space.add(constraint_right)
 
 
 class Wing():
