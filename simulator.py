@@ -6,7 +6,7 @@ from bird import Bird
 from floor import Floor
 from background import Background
 
-HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing."""
+HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart."""
 
 pygame.init()
 
@@ -32,6 +32,7 @@ draw_options = pymunk.pygame_util.DrawOptions(window)
 bird = Bird(space, WIDTH / 2)
 zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
 floor = Floor(space, WIDTH)
+text = pygame.font.Font(None, 16).render(HELP_TEXT,True,pygame.Color("black"))
 
 
 def translate_coords(v):
@@ -51,14 +52,14 @@ def negate_point(p0, p1):
 
 def run_simulation():
     run_physics = True
-   
+
     while True:
         window.fill((0,0,0))
         bg.update()
         bg.render()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit()
+            if event.type == pygame.QUIT: pygame.quit() 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(window, "bird_capture.png")
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_j: bird.right_wing_down()
@@ -70,6 +71,7 @@ def run_simulation():
 
         zoom.update()
         space.debug_draw(draw_options)
+        window.blit(text, (5, 5))
         pygame.display.update()
         if run_physics:
             space.step(DT)
