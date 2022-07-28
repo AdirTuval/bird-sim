@@ -5,7 +5,7 @@ import pymunk
 from bird import BIRD_RECT_HEIGHT, BIRD_RECT_WIDTH, Bird
 from floor import Floor
 import math
-
+from background import Background
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
@@ -21,6 +21,7 @@ RIGHT = 1
 pymunk.pygame_util.positive_y_is_up = True
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+bg = Background(window)
 clock = pygame.time.Clock()
 space = pymunk.Space()
 space.gravity = 0, GRAVITY
@@ -73,7 +74,9 @@ def run_simulation():
     rotation = 0
 
     while True:
-        window.fill(BACKGROUND_COLOR)
+        window.fill((0,0,0))
+        bg.update()
+        bg.render()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -132,7 +135,6 @@ def run_simulation():
     
         # lift = get_lift()
 
-        window.fill(BACKGROUND_COLOR)
         window.blit(text, (5, 5))
         space.debug_draw(draw_options)
         pygame.display.update()

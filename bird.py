@@ -8,6 +8,7 @@ FRICTION = 0.4
 BIRD_MASS = 3
 BIRD_OPACITY = 100
 BIRD_COLOR = 255, 0 ,0, BIRD_OPACITY
+YELLOW = 255, 255, 0, 100
 WING_WIDTH = 60
 WING_MASS = 1
 BIRD_WING_OFFSET = 10
@@ -48,4 +49,6 @@ class Wing():
         self.shape = pymunk.Segment(self.body, (0-WING_WIDTH/2,0), (WING_WIDTH/2,0), 6)
         self.shape.mass = WING_MASS
         self.shape.friction = 0.7
+        self.shape.color = YELLOW
         space.add(self.body, self.shape)
+git 
