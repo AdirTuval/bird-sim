@@ -51,4 +51,4 @@ class Wing():
         self.shape.friction = 0.7
         self.shape.color = YELLOW
         space.add(self.body, self.shape)
-git 
+        
