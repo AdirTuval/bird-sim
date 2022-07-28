@@ -5,8 +5,8 @@ import pymunk
 from bird import Bird
 from floor import Floor
 from background import Background
-
 HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart."""
+
 
 pygame.init()
 
@@ -30,6 +30,7 @@ space.gravity = 0, GRAVITY
 draw_options = pymunk.pygame_util.DrawOptions(window)
 
 bird = Bird(space, WIDTH / 2)
+bird.body.angle = 1.2
 zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
 floor = Floor(space, WIDTH)
 text = pygame.font.Font(None, 16).render(HELP_TEXT,True,pygame.Color("black"))
@@ -72,6 +73,8 @@ def run_simulation():
         zoom.update()
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
+        bird_height = pygame.font.Font(None, 16).render(str(bird.right_wing.body.angle) + " " + str(round(bird.body.angle,3)),True,pygame.Color("red"))
+        window.blit(bird_height, (5,20))
         pygame.display.update()
         if run_physics:
             space.step(DT)

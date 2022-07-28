@@ -52,16 +52,25 @@ class Bird():
 
     def left_wing_down(self):
         self.left_wing.down()
+        if self._is_left_wing_pos_valid_for_force_application():
+            self.body.apply_impulse_at_local_point((100,1000), (0,0))
 
     def right_wing_down(self):
         self.right_wing.down()
+        if self._is_left_wing_pos_valid_for_force_application():
+            self.body.apply_impulse_at_local_point((-100,1000), (0,0))
 
     def left_wing_up(self):
         self.left_wing.up()
 
     def right_wing_up(self):
         self.right_wing.up()
+    
+    def _is_left_wing_pos_valid_for_force_application(self):
+        return self.left_wing.body.angle < 0.7
 
+    def _is_right_wing_pos_valid_for_force_application(self):
+        return self.right_wing.body.angle > -0.7
 
 class Wing():
     WING_WIDTH = 60
