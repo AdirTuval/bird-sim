@@ -5,7 +5,12 @@ import pymunk
 from bird import Bird
 from floor import Floor
 from background import Background
+<<<<<<< HEAD
 HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart."""
+=======
+
+HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart. Q for quit"""
+>>>>>>> 4a2a7f5b9236af709c2fcc35f3eee0ae085b377e
 
 
 pygame.init()
@@ -33,7 +38,7 @@ bird = Bird(space, WIDTH / 2)
 bird.body.angle = 1.2
 zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
 floor = Floor(space, WIDTH)
-text = pygame.font.Font(None, 16).render(HELP_TEXT,True,pygame.Color("black"))
+text = pygame.font.Font(None, 16).render(HELP_TEXT, True, pygame.Color("black"))
 
 
 def translate_coords(v):
@@ -52,23 +57,35 @@ def negate_point(p0, p1):
 
 
 def run_simulation():
+    running = True
     run_physics = True
 
-    while True:
-        window.fill((0,0,0))
+    while running:
+        window.fill((0, 0, 0))
         bg.update(bird.body.position)
         bg.render()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit() 
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN and (
+                    event.key in [pygame.K_ESCAPE, pygame.K_q]
+            ):
+                running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(window, "bird_capture.png")
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_j: bird.right_wing_down()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_k: bird.right_wing_up()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_f: bird.left_wing_down()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_d: bird.left_wing_up()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: run_physics = not run_physics
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_r: bird.re_origin()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_j:
+                bird.right_wing_down()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_k:
+                bird.right_wing_up()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
+                bird.left_wing_down()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_d:
+                bird.left_wing_up()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                run_physics = not run_physics
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                bird.re_origin()
 
         zoom.update()
         space.debug_draw(draw_options)
