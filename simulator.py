@@ -6,6 +6,9 @@ from bird import BIRD_RECT_HEIGHT, BIRD_RECT_WIDTH, Bird
 from floor import Floor
 import math
 
+HELP_TEXT = """Use Arrows (up, down, left, right) to move the camera, a and z to zoom in / out.
+R - restart"""
+
 pygame.init()
 
 WIDTH, HEIGHT = 800, 600
@@ -63,8 +66,7 @@ def run_simulation():
 
     font = pygame.font.Font(None, 16)
     text = font.render(
-        "Use Arrows (up, down, left, right) to move the camera, "
-        "a and z to zoom in / out.",
+        HELP_TEXT,
         True,
         pygame.Color("black"),
     )
@@ -92,6 +94,10 @@ def run_simulation():
                 bird.body.apply_impulse_at_local_point(right_lift, (BIRD_RECT_WIDTH / 2, BIRD_RECT_HEIGHT/2))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 run_physics = not run_physics
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                bird.re_origin()
+
+
 
         keys = pygame.key.get_pressed()
         left = int(keys[pygame.K_LEFT])
@@ -129,7 +135,7 @@ def run_simulation():
             dv_right = bird.right_wing.body.velocity - prior_v_right if prior_v_right else bird.right_wing.body.velocity
             prior_v_right = bird.right_wing.body.velocity
 
-    
+
         # lift = get_lift()
 
         window.fill(BACKGROUND_COLOR)
@@ -139,7 +145,7 @@ def run_simulation():
         if run_physics:
             space.step(DT)
         clock.tick(FPS)
-    
+
 
 
 

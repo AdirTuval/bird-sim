@@ -17,6 +17,8 @@ class Bird():
     def __init__(self, space, x_location) -> None:
         self.body = pymunk.Body()
         self.body.position = x_location, BIRD_RECT_HEIGHT/2
+        self.origin = (self.body.position, self.body.angle,
+                       self.body.velocity, self.body.angular_velocity)
         self.shape = pymunk.Poly.create_box(self.body, (BIRD_RECT_WIDTH, BIRD_RECT_HEIGHT))
         self.shape.elasticity = ELASTICITY
         self.shape.friction = FRICTION
@@ -40,12 +42,23 @@ class Bird():
         space.add(limit_right)
         space.add(constraint_right)
 
+    def re_origin(self):
+        (self.body.position, self.body.angle,
+         self.body.velocity, self.body.angular_velocity) = self.origin
+        self.left_wing.re_origin()
+        self.right_wing.re_origin()
 
 class Wing():
     def __init__(self, space, position) -> None:
         self.body = pymunk.Body()
         self.body.position = position
+        self.origin = (self.body.position, self.body.angle,
+                       self.body.velocity, self.body.angular_velocity)
         self.shape = pymunk.Segment(self.body, (0-WING_WIDTH/2,0), (WING_WIDTH/2,0), 6)
         self.shape.mass = WING_MASS
         self.shape.friction = 0.7
         space.add(self.body, self.shape)
+
+    def re_origin(self):
+        (self.body.position, self.body.angle,
+         self.body.velocity, self.body.angular_velocity) = self.origin
