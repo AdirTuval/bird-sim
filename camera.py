@@ -1,8 +1,8 @@
 import pygame
 import pymunk.pygame_util
 import pymunk
-TRANSLATE_SPEED = 10
-ZOOM_SPEED = 0.1
+from constants import *
+
 class Camera:
     def __init__(self, draw_options, bird, width, height ):
         self.translation = pymunk.Transform()

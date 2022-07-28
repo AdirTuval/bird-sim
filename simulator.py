@@ -5,21 +5,10 @@ import pymunk
 from bird import Bird
 from floor import Floor
 from background import Background
-
-HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart. Q for quit"""
+from constants import *
 
 
 pygame.init()
-
-WIDTH, HEIGHT = 800, 600
-FPS = 60
-DT = 1 / FPS
-GRAVITY = -1000
-FLOOR_HEIGHT = 10
-BACKGROUND_COLOR = "white"
-AIR_MASS = 0.5
-LEFT = 0
-RIGHT = 1
 
 pymunk.pygame_util.positive_y_is_up = True
 
