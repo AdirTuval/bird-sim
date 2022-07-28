@@ -1,5 +1,6 @@
 import pygame
 import pymunk.pygame_util
+from camera import Camera
 from pymunk import Vec2d
 import pymunk
 from bird import BIRD_RECT_HEIGHT, BIRD_RECT_WIDTH, Bird
@@ -27,6 +28,7 @@ space.gravity = 0, GRAVITY
 draw_options = pymunk.pygame_util.DrawOptions(window)
 
 bird = Bird(space, WIDTH / 2)
+zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
 floor = Floor(space, WIDTH)
 
 def translate_coords(v):
@@ -61,20 +63,19 @@ def run_simulation():
     prior_v_right = None
     dv_right = None
 
-    font = pygame.font.Font(None, 16)
-    text = font.render(
-        "Use Arrows (up, down, left, right) to move the camera, "
-        "a and z to zoom in / out.",
-        True,
-        pygame.Color("black"),
-    )
-    translation = pymunk.Transform()
-    scaling = 1
-    rotation = 0
 
+    # translation = pymunk.Transform()
+    # scaling = 1
+    
     while True:
         window.fill(BACKGROUND_COLOR)
-
+        font = pygame.font.Font(None, 16)
+        text = font.render(
+            "Use A,Z for zoom.",
+            str(bird.body.position),
+            True,
+            pygame.Color("black"),
+        )
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -93,46 +94,14 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 run_physics = not run_physics
 
-        keys = pygame.key.get_pressed()
-        left = int(keys[pygame.K_LEFT])
-        up = int(keys[pygame.K_UP])
-        down = int(keys[pygame.K_DOWN])
-        right = int(keys[pygame.K_RIGHT])
-        zoom_in = int(keys[pygame.K_a])
-        zoom_out = int(keys[pygame.K_z])
-
-        if pymunk.pygame_util.positive_y_is_up:
-            up, down = down, up
-
-        translate_speed = 10
-        translation = translation.translated(
-            translate_speed * left - translate_speed * right,
-            translate_speed * up - translate_speed * down,
-        )
-
-        zoom_speed = 0.1
-        scaling *= 1 + (zoom_speed * zoom_in - zoom_speed * zoom_out)
-
-        # to zoom with center of screen as origin we need to offset with
-        # center of screen, scale, and then offset back
-        draw_options.transform = (
-            pymunk.Transform.translation(300, 300)
-            @ pymunk.Transform.scaling(scaling)
-            @ translation
-            @ pymunk.Transform.translation(-300, -300)
-        )
-
-
         if run_physics:
             dv_left = bird.left_wing.body.velocity - prior_v_left if prior_v_left else bird.left_wing.body.velocity
             prior_v_left = bird.left_wing.body.velocity
             dv_right = bird.right_wing.body.velocity - prior_v_right if prior_v_right else bird.right_wing.body.velocity
             prior_v_right = bird.right_wing.body.velocity
 
-    
-        # lift = get_lift()
-
         window.fill(BACKGROUND_COLOR)
+        zoom.update()
         window.blit(text, (5, 5))
         space.debug_draw(draw_options)
         pygame.display.update()
