@@ -3,7 +3,7 @@ import pymunk.pygame_util
 from camera import Camera
 from pymunk import Vec2d
 import pymunk
-from bird import BIRD_RECT_HEIGHT, BIRD_RECT_WIDTH, Bird
+from bird import Bird, Wing
 from floor import Floor
 import math
 from background import Background
@@ -81,15 +81,15 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(window, "bird_capture.png")
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_f:
-                bird.left_wing.body.apply_impulse_at_local_point((0, 300), (-30, 0))
-                bird.right_wing.body.apply_impulse_at_local_point((0, 300), (30, 0))
+                bird.left_wing.body.apply_impulse_at_local_point((0, 300), (-Wing.WING_WIDTH, 0))
+                bird.right_wing.body.apply_impulse_at_local_point((0, 300), (Wing.WING_WIDTH, 0))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
-                bird.left_wing.body.apply_impulse_at_local_point((0, -100), (-30, 0))
-                bird.right_wing.body.apply_impulse_at_local_point((0, -100), (30, 0))
+                bird.left_wing.body.apply_impulse_at_local_point((0, -100), (-Wing.WING_WIDTH, 0))
+                bird.right_wing.body.apply_impulse_at_local_point((0, -100), (Wing.WING_WIDTH, 0))
                 left_lift = calc_velocity_vectors(bird.left_wing.body.position, (AIR_MASS / DT) * dv_left)
                 right_lift = calc_velocity_vectors(bird.right_wing.body.position, (AIR_MASS / DT) * dv_right)
-                bird.body.apply_impulse_at_local_point(left_lift, (-BIRD_RECT_WIDTH / 2, BIRD_RECT_HEIGHT / 2))
-                bird.body.apply_impulse_at_local_point(right_lift, (BIRD_RECT_WIDTH / 2, BIRD_RECT_HEIGHT / 2))
+                bird.body.apply_impulse_at_local_point(left_lift, (-Bird.BIRD_RECT_WIDTH / 2, Bird.BIRD_RECT_HEIGHT / 2))
+                bird.body.apply_impulse_at_local_point(right_lift, (Bird.BIRD_RECT_WIDTH / 2, Bird.BIRD_RECT_HEIGHT / 2))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 run_physics = not run_physics
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
