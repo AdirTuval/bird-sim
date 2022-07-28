@@ -90,10 +90,10 @@ class Wing():
         space.add(self.body, self.shape)
 
     def down(self):
-        self.body.apply_impulse_at_local_point((0, -WING_FORCE), (0, 0))
+        self.body.apply_impulse_at_local_point((0, -WING_FORCE*3), (0, 0))
 
     def up(self):
-        self.body.apply_impulse_at_local_point((0, WING_FORCE), (0, 0))
+        self.body.apply_impulse_at_local_point((0, WING_FORCE*3), (0, 0))
 
     def re_origin(self):
         (self.body.position, self.body.angle,
