@@ -1,5 +1,7 @@
 import pygame
 import pymunk.pygame_util
+from pymunk.vec2d import Vec2d
+
 from camera import Camera
 import pymunk
 from bird import Bird
@@ -19,6 +21,7 @@ BACKGROUND_COLOR = "white"
 AIR_MASS = 0.5
 LEFT = 0
 RIGHT = 1
+DRAG_COEFFICIENT = 0.0002
 
 pymunk.pygame_util.positive_y_is_up = True
 
@@ -49,11 +52,27 @@ def negate_point(p0, p1):
     return p0
 
 
+def apply_drag_force(body: pymunk.Body, tail_position: Vec2d):
+    pointing_direction = Vec2d(1, 0).rotated(body.angle)
+    flight_direction = Vec2d(*body.velocity)
+    flight_direction, flight_speed = flight_direction.normalized_and_length()
+
+    dot = flight_direction.dot(pointing_direction)
+    drag_force_magnitude = (
+            (1 - abs(dot)) * flight_speed ** 2 * DRAG_COEFFICIENT * body.mass
+    )
+    body_tail_position = body.position + tail_position.rotated(body.angle)
+    body.apply_impulse_at_world_point(
+        drag_force_magnitude * -flight_direction, body_tail_position
+    )
+    body.angular_velocity *= 0.5
+
+
 def run_simulation():
     run_physics = True
-   
+
     while True:
-        window.fill((0,0,0))
+        window.fill((0, 0, 0))
         bg.update()
         bg.render()
 
@@ -68,8 +87,14 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: run_physics = not run_physics
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r: bird.re_origin()
 
+
+
         zoom.update()
         space.debug_draw(draw_options)
+
+        if run_physics:
+            apply_drag_force(bird.body, Vec2d(0, -bird.BIRD_RECT_HEIGHT/2))
+
         pygame.display.update()
         if run_physics:
             space.step(DT)
