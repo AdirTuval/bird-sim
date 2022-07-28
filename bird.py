@@ -27,38 +27,19 @@ class Bird():
         self.shape.mass = self.BIRD_MASS
         self.shape.color = self.BIRD_COLOR
         space.add(self.body, self.shape)
-<<<<<<< HEAD
-        self._create_left_wing(space, x_location - BIRD_RECT_WIDTH / 2 - WING_WIDTH / 2)
-        self._create_right_wing(space, x_location + BIRD_RECT_WIDTH / 2 + WING_WIDTH / 2)
+        self._create_left_wing(space, x_location - self.BIRD_RECT_WIDTH / 2 - Wing.WING_WIDTH / 2)
+        self._create_right_wing(space, x_location + self.BIRD_RECT_WIDTH / 2 + Wing.WING_WIDTH / 2)
 
     def _create_left_wing(self, space, x_location):
-        self.left_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body, (-BIRD_RECT_WIDTH / 2 - BIRD_WING_OFFSET, BIRD_RECT_HEIGHT / 2), (WING_WIDTH / 2, 0))
-=======
-        self.create_left_wing(space, x_location - self.BIRD_RECT_WIDTH / 2 - Wing.WING_WIDTH / 2)
-        self.create_right_wing(space, x_location + self.BIRD_RECT_WIDTH / 2 + Wing.WING_WIDTH / 2)
-
-    def create_left_wing(self, space, x_location):
         self.left_wing = Wing(space, (x_location, self.BIRD_RECT_HEIGHT))
-        constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body,
-                                            (-self.BIRD_RECT_WIDTH / 2 - self.BIRD_WING_OFFSET, self.BIRD_RECT_HEIGHT / 2),
-                                            (Wing.WING_WIDTH / 2, 0))
->>>>>>> f8662c971b38890f91a8aa3c04413d18a16b2ede
+        constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body, (-self.BIRD_RECT_WIDTH / 2 - self.BIRD_WING_OFFSET, self.BIRD_RECT_HEIGHT / 2), (Wing.WING_WIDTH / 2, 0))
         limit_left = pymunk.RotaryLimitJoint(self.body, self.left_wing.body, -PI / 2, PI)
         space.add(limit_left)
         space.add(constraint_left)
 
-<<<<<<< HEAD
     def _create_right_wing(self, space, x_location):
-        self.right_wing = Wing(space, (x_location, BIRD_RECT_HEIGHT))
-        constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body, (BIRD_RECT_WIDTH / 2 + BIRD_WING_OFFSET, BIRD_RECT_HEIGHT / 2), (-WING_WIDTH / 2, 0))
-=======
-    def create_right_wing(self, space, x_location):
         self.right_wing = Wing(space, (x_location, self.BIRD_RECT_HEIGHT))
-        constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body,
-                                             (self.BIRD_RECT_WIDTH / 2 + self.BIRD_WING_OFFSET, self.BIRD_RECT_HEIGHT / 2),
-                                             (-Wing.WING_WIDTH / 2, 0))
->>>>>>> f8662c971b38890f91a8aa3c04413d18a16b2ede
+        constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body, (self.BIRD_RECT_WIDTH / 2 + self.BIRD_WING_OFFSET, self.BIRD_RECT_HEIGHT / 2), (-Wing.WING_WIDTH / 2, 0))
         limit_right = pymunk.RotaryLimitJoint(self.body, self.right_wing.body, -PI, PI / 2)
         space.add(limit_right)
         space.add(constraint_right)
@@ -98,15 +79,12 @@ class Wing():
         self.shape.friction = 0.7
         self.shape.color = YELLOW
         space.add(self.body, self.shape)
-<<<<<<< HEAD
 
     def down(self):
         self.body.apply_impulse_at_local_point((0, -WING_FORCE), (0, 0))
 
     def up(self):
         self.body.apply_impulse_at_local_point((0, WING_FORCE), (0, 0))
-=======
->>>>>>> f8662c971b38890f91a8aa3c04413d18a16b2ede
 
     def re_origin(self):
         (self.body.position, self.body.angle,
