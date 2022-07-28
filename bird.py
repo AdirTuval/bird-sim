@@ -1,10 +1,8 @@
 import pymunk
 import math
+from constants import *
 
-YELLOW = 255, 255, 0, 100
-PI = math.pi
 WING_FORCE = 300
-
 
 class Bird():
     RECT_WIDTH = 50
