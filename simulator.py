@@ -58,7 +58,7 @@ def calc_velocity_vectors(origin, v, side=LEFT):
         Vec2d(0, 0)
     down_force = origin + Vec2d(*int_point(v))
     lift_force = negate_point(down_force, origin)
-    pygame.draw.line(window, "black", translate_coords(origin), translate_coords(lift_force))
+    # pygame.draw.line(window, "black", translate_coords(origin), translate_coords(lift_force))
     return 0, lift_force[1]  # Hacky shit, canceling X force.
 
 
