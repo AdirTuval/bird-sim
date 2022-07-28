@@ -6,7 +6,7 @@ ZOOM_SPEED = 0.1
 class Camera:
     def __init__(self, draw_options, bird, width, height ):
         self.translation = pymunk.Transform()
-        self.scaling = 0.8
+        self.scaling = 0.3
         self.draw_options = draw_options
         self.bird = bird
         self.last_position = self.bird.body.position
