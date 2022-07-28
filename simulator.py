@@ -54,7 +54,7 @@ def run_simulation():
    
     while True:
         window.fill((0,0,0))
-        bg.update()
+        bg.update(bird.body.position)
         bg.render()
 
         for event in pygame.event.get():
