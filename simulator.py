@@ -50,15 +50,21 @@ def negate_point(p0, p1):
 
 
 def run_simulation():
+    running = True
     run_physics = True
-   
-    while True:
+
+    while running:
         window.fill((0,0,0))
         bg.update(bird.body.position)
         bg.render()
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit()
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN and (
+                event.key in [pygame.K_ESCAPE, pygame.K_q]
+            ):
+                running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                 pygame.image.save(window, "bird_capture.png")
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_j: bird.right_wing_down()
