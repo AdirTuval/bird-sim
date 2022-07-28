@@ -1,11 +1,9 @@
 import pygame
 import pymunk.pygame_util
 from camera import Camera
-from pymunk import Vec2d
 import pymunk
-from bird import BIRD_RECT_HEIGHT, BIRD_RECT_WIDTH, Bird
+from bird import Bird
 from floor import Floor
-import math
 from background import Background
 
 HELP_TEXT = """Use Arrows (up, down, left, right) to move the camera, a and z to zoom in / out.
