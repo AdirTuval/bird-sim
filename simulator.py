@@ -6,8 +6,7 @@ from bird import Bird
 from floor import Floor
 from background import Background
 
-HELP_TEXT = """Use Arrows (up, down, left, right) to move the camera, a and z to zoom in / out.
-R - restart"""
+HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing."""
 
 pygame.init()
 
