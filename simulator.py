@@ -6,7 +6,7 @@ from bird import Bird
 from floor import Floor
 from background import Background
 
-HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart."""
+HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart. Q for quit"""
 
 pygame.init()
 
