@@ -41,12 +41,6 @@ def negate_point(p0, p1):
     return p0
 
 
-def lift(m: float, dt: float, dv: Vec2d):
-    down_force = m / dt * dv
-    # lift = negate_point(down_force, position)
-    return -down_force
-
-
 def draw_dv(dv_left: Vec2d, dv_right: Vec2d):
     pygame.draw.line(window, BLACK,
                      pygame_util.to_pygame(bird.left_wing.body.position, window),
@@ -55,6 +49,7 @@ def draw_dv(dv_left: Vec2d, dv_right: Vec2d):
                      pygame_util.to_pygame(bird.right_wing.body.position, window),
                      pygame_util.to_pygame(bird.right_wing.body.position + dv_right, window))
 
+
 def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
     pygame.draw.line(window, RED,
                      pygame_util.to_pygame(bird.left_wing.body.position, window),
@@ -62,6 +57,13 @@ def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
     pygame.draw.line(window, RED,
                      pygame_util.to_pygame(bird.right_wing.body.position, window),
                      pygame_util.to_pygame(bird.right_wing.body.position + lift_right, window))
+
+
+def lift(m: float, dt: float, dv: Vec2d):
+    down_force = m / dt * dv
+    # lift = negate_point(down_force, position)
+    return -down_force
+
 
 def run_simulation():
     # DEBUG PRINTS
@@ -82,33 +84,32 @@ def run_simulation():
         bg.update(bird.body.position)
         bg.render()
 
-        if run_physics:
-            dv_left = bird.left_wing.body.velocity - prev_v_left
-            dv_right = bird.right_wing.body.velocity - prev_v_right
-            prev_v_left = bird.left_wing.body.velocity
-            prev_v_right = bird.right_wing.body.velocity
-
-            lift_right = lift(AIR_MASS, DT, dv_right)
-            lift_left = lift(AIR_MASS, DT, dv_left)
-
         if debug_draw_dv:
             draw_dv(dv_left, dv_right)
 
         if debug_draw_lift:
             draw_lift(lift_left, lift_right)
 
+        if run_physics:
+            dv_left = bird.left_wing.body.velocity - prev_v_left
+            dv_right = bird.right_wing.body.velocity - prev_v_right
+            prev_v_left = bird.left_wing.body.velocity
+            prev_v_right = bird.right_wing.body.velocity
+            lift_left = lift(bird.left_wing.WING_AREA, DT, dv_left)
+            lift_right = lift(bird.right_wing.WING_AREA, DT, dv_right)
+
         # capture movement keys
-        if pygame.key.get_pressed()[pygame.K_j]:
-            bird.right_wing_down()
-
-        if pygame.key.get_pressed()[pygame.K_k]:
-            bird.right_wing_up()
-
-        if pygame.key.get_pressed()[pygame.K_f]:
+        if pygame.key.get_pressed()[pygame.K_f]:  # Down left
             bird.left_wing_down()
 
-        if pygame.key.get_pressed()[pygame.K_d]:
+        if pygame.key.get_pressed()[pygame.K_j]:  # Down right
+            bird.right_wing_down()
+
+        if pygame.key.get_pressed()[pygame.K_d]:  # Up left
             bird.left_wing_up()
+
+        if pygame.key.get_pressed()[pygame.K_k]:  # Up right
+            bird.right_wing_up()
 
         # capture game settings keys
         for event in pygame.event.get():
