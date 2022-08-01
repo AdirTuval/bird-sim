@@ -34,13 +34,6 @@ def int_point(p):
     return int(p[0]), int(p[1])
 
 
-def negate_point(p0, p1):
-    p0 -= p1
-    p0 *= -1
-    p0 += p1
-    return p0
-
-
 def draw_dv(dv_left: Vec2d, dv_right: Vec2d):
     pygame.draw.line(window, BLACK,
                      pygame_util.to_pygame(bird.left_wing.body.position, window),
@@ -61,7 +54,6 @@ def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
 
 def lift(m: float, dt: float, dv: Vec2d):
     down_force = m / dt * dv
-    # lift = negate_point(down_force, position)
     return -down_force
 
 
