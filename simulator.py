@@ -21,7 +21,7 @@ space.gravity = 0, GRAVITY
 draw_options = pygame_util.DrawOptions(window)
 
 bird = Bird(space, WIDTH / 2)
-# zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
+zoom = Camera(draw_options, bird, WIDTH, HEIGHT)
 floor = Floor(space, WIDTH)
 text = pygame.font.Font(None, 16).render(HELP_TEXT, True, pygame.Color("black"))
 
@@ -66,9 +66,9 @@ def lift(m: float, dt: float, dv: Vec2d):
 
 
 def run_simulation():
-    # DEBUG PRINTS
-    debug_draw_dv = True
-    debug_draw_lift = True
+    # DEBUG PRINTS - enable only when zoom is not set.
+    debug_draw_dv = False
+    debug_draw_lift = False
 
     running = True
     run_physics = True
@@ -126,7 +126,7 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 bird.re_origin()
 
-        # zoom.update()
+        zoom.update()
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
         bird_height = pygame.font.Font(None, 16).render(str(bird.body.position[1]), True, pygame.Color("red"))
