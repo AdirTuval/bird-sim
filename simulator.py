@@ -47,10 +47,26 @@ def lift(m: float, dt: float, dv: Vec2d):
     return -down_force
 
 
+def draw_dv(dv_left: Vec2d, dv_right: Vec2d):
+    pygame.draw.line(window, BLACK,
+                     pygame_util.to_pygame(bird.left_wing.body.position, window),
+                     pygame_util.to_pygame(bird.left_wing.body.position + dv_left, window))
+    pygame.draw.line(window, BLACK,
+                     pygame_util.to_pygame(bird.right_wing.body.position, window),
+                     pygame_util.to_pygame(bird.right_wing.body.position + dv_right, window))
+
+def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
+    pygame.draw.line(window, RED,
+                     pygame_util.to_pygame(bird.left_wing.body.position, window),
+                     pygame_util.to_pygame(bird.left_wing.body.position + lift_left, window))
+    pygame.draw.line(window, RED,
+                     pygame_util.to_pygame(bird.right_wing.body.position, window),
+                     pygame_util.to_pygame(bird.right_wing.body.position + lift_right, window))
+
 def run_simulation():
     # DEBUG PRINTS
-    draw_dv = True
-    draw_lift = True
+    d_draw_dv = True
+    d_draw_lift = True
 
     running = True
     run_physics = True
@@ -75,21 +91,11 @@ def run_simulation():
             lift_right = lift(AIR_MASS, DT, dv_right)
             lift_left = lift(AIR_MASS, DT, dv_left)
 
-        if draw_dv:
-            pygame.draw.line(window, BLACK,
-                             pygame_util.to_pygame(bird.left_wing.body.position, window),
-                             pygame_util.to_pygame(bird.left_wing.body.position + dv_left * 3, window))
-            pygame.draw.line(window, BLACK,
-                             pygame_util.to_pygame(bird.right_wing.body.position, window),
-                             pygame_util.to_pygame(bird.right_wing.body.position + dv_right * 3, window))
+        if d_draw_dv:
+            draw_dv(dv_left, dv_right)
 
-        if draw_lift:
-            pygame.draw.line(window, RED,
-                             pygame_util.to_pygame(bird.left_wing.body.position, window),
-                             pygame_util.to_pygame(bird.left_wing.body.position + lift_left, window))
-            pygame.draw.line(window, RED,
-                             pygame_util.to_pygame(bird.right_wing.body.position, window),
-                             pygame_util.to_pygame(bird.right_wing.body.position + lift_right, window))
+        if d_draw_lift:
+            draw_lift(lift_left, lift_right)
 
         # capture movement keys
         if pygame.key.get_pressed()[pygame.K_j]:
