@@ -65,8 +65,8 @@ def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
 
 def run_simulation():
     # DEBUG PRINTS
-    d_draw_dv = True
-    d_draw_lift = True
+    debug_draw_dv = True
+    debug_draw_lift = True
 
     running = True
     run_physics = True
@@ -91,10 +91,10 @@ def run_simulation():
             lift_right = lift(AIR_MASS, DT, dv_right)
             lift_left = lift(AIR_MASS, DT, dv_left)
 
-        if d_draw_dv:
+        if debug_draw_dv:
             draw_dv(dv_left, dv_right)
 
-        if d_draw_lift:
+        if debug_draw_lift:
             draw_lift(lift_left, lift_right)
 
         # capture movement keys
