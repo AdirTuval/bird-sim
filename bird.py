@@ -1,5 +1,5 @@
+from typing import Union, Tuple
 import pymunk
-import math
 from constants import *
 
 
@@ -13,7 +13,7 @@ class Bird():
     ELASTICITY = 0.2
     FRICTION = 0.4
 
-    def __init__(self, space, x_location) -> None:
+    def __init__(self, space: pymunk.Space, x_location: float) -> None:
         self.body = pymunk.Body()
         self.body.position = x_location, self.HEIGHT / 2
         self.origin = (self.body.position, self.body.angle,
@@ -52,12 +52,12 @@ class Bird():
     def left_wing_down(self):
         self.left_wing.down()
         if self._is_left_wing_pos_valid_for_force_application():
-            self.body.apply_impulse_at_local_point((100,1000), (0,0))
+            self.body.apply_force_at_local_point((100, 20000), (0, 0))
 
     def right_wing_down(self):
         self.right_wing.down()
         if self._is_left_wing_pos_valid_for_force_application():
-            self.body.apply_impulse_at_local_point((-100,1000), (0,0))
+            self.body.apply_force_at_local_point((-100, 20000), (0, 0))
 
     def left_wing_up(self):
         self.left_wing.up()
@@ -77,11 +77,11 @@ class Wing():
     HEIGHT = 6
     WING_AREA = WIDTH * HEIGHT
     MASS = 2
-    STRENGTH = 100
+    STRENGTH = 3000
     FRICTION = 0.7
     ELASTICITY = 0.2
 
-    def __init__(self, space, position) -> None:
+    def __init__(self, space: pymunk.Space, position: Union[pymunk.vec2d.Vec2d, Tuple[float, float]]) -> None:
         self.body = pymunk.Body()
         self.body.position = position
         self.origin = (self.body.position, self.body.angle,
@@ -95,10 +95,10 @@ class Wing():
         space.add(self.body, self.shape)
 
     def down(self):
-        self.body.apply_impulse_at_local_point((0, -self.STRENGTH))
+        self.body.apply_force_at_local_point((0, -self.STRENGTH))
 
     def up(self):
-        self.body.apply_impulse_at_local_point((0, self.STRENGTH / 2))
+        self.body.apply_force_at_local_point((0, self.STRENGTH))
 
     def re_origin(self):
         (self.body.position, self.body.angle,
