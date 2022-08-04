@@ -28,7 +28,8 @@ pymunk.pygame_util.positive_y_is_up = True
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 bg = Background(window)
 clock = pygame.time.Clock()
-space = pymunk.Space()
+space = pymunk.Space(threaded=True)
+space.threads = 2
 space.gravity = 0, GRAVITY
 draw_options = pygame_util.DrawOptions(window)
 
