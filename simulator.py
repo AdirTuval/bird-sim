@@ -108,7 +108,7 @@ def run_simulation():
 
     while running:
         window.fill((0, 0, 0))
-        bg.update(bird.body.position)
+        bg.update(bird.position)
         bg.render()
 
         if debug_draw_dv:
@@ -160,7 +160,7 @@ def run_simulation():
         zoom.update()
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
-        bird_height = pygame.font.Font(None, 16).render(str(bird.body.position[1]), True, pygame.Color("red"))
+        bird_height = pygame.font.Font(None, 16).render(str(bird.y), True, pygame.Color("red"))
         window.blit(bird_height, (5, 20))
         pygame.display.update()
 

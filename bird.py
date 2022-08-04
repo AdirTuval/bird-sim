@@ -29,6 +29,34 @@ class Bird():
         self._create_left_wing(space, x_location - self.WIDTH / 2 - Wing.WIDTH / 2)
         self._create_right_wing(space, x_location + self.WIDTH / 2 + Wing.WIDTH / 2)
 
+    @property
+    def x(self) -> float:
+        return self.body.position[0]
+
+    @property
+    def y(self) -> float:
+        return self.body.position[1]
+
+    @property
+    def position(self) -> Vec2d:
+        return self.body.position
+
+    @property
+    def angle(self) -> float:
+        return self.body.angle
+
+    @property
+    def velocity(self) -> Vec2d:
+        return self.body.velocity
+
+    @property
+    def angular_velocity(self) -> float:
+        return self.body.angular_velocity
+
+    @property
+    def mass(self) -> float:
+        return self.shape.mass
+
     def tail_position(self) -> Vec2d:
         return self.body.position + Vec2d(0, -self.HEIGHT / 2).rotated(self.body.angle)
 
