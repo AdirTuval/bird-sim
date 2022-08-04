@@ -1,9 +1,11 @@
 import sys
+from typing import Tuple
+
 import pygame
 from pymunk import pygame_util
 from camera import Camera
 import pymunk
-from pymunk.vec2d import Vec2d
+from pymunk import Vec2d
 from bird import Bird
 from floor import Floor
 from background import Background
@@ -20,7 +22,6 @@ BACKGROUND_COLOR = "white"
 AIR_MASS = 0.5
 LEFT = 0
 RIGHT = 1
-DRAG_COEFFICIENT = 0.0002
 
 pymunk.pygame_util.positive_y_is_up = True
 
@@ -63,31 +64,38 @@ def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
                      pygame_util.to_pygame(bird.right_wing.body.position + lift_right, window))
 
 
+def draw_drag_force(drag_force: Vec2d, applied_point: Vec2d):
+    pygame.draw.line(window, WHITE,
+                     pygame_util.to_pygame(applied_point, window),
+                     pygame_util.to_pygame(applied_point + drag_force, window), 10)
+
+
 def lift(m: float, dt: float, dv: Vec2d):
     down_force = m / dt * dv
     return -down_force
 
 
-def apply_drag_force(body: pymunk.Body, tail_position: Vec2d):
+def apply_drag_force(body: pymunk.Body, *, drag_coeff: float = DRAG_COEFFICIENT) -> Tuple[Vec2d, Vec2d]:
     pointing_direction = Vec2d(1, 0).rotated(body.angle)
     flight_direction = Vec2d(*body.velocity)
     flight_direction, flight_speed = flight_direction.normalized_and_length()
 
     dot = flight_direction.dot(pointing_direction)
-    drag_force_magnitude = (
-            (1 - abs(dot)) * flight_speed ** 2 * DRAG_COEFFICIENT * body.mass
-    )
-    body_tail_position = body.position + tail_position.rotated(body.angle)
-    body.apply_impulse_at_world_point(
-        drag_force_magnitude * -flight_direction, body_tail_position
-    )
-    body.angular_velocity *= 0.5
+
+    drag_force_magnitude = (1 - abs(dot)) * (flight_speed ** 2) * drag_coeff * body.mass
+    drag_force = drag_force_magnitude * -flight_direction
+
+    body.apply_force_at_local_point(drag_force)
+    body.angular_velocity *= ANGULAR_VELOCITY_DECAY
+
+    return drag_force, body.position
 
 
 def run_simulation():
     # DEBUG PRINTS - enable only when zoom is not set.
     debug_draw_dv = False
     debug_draw_lift = False
+    debug_draw_drag_force = False
 
     running = True
     run_physics = True
@@ -110,6 +118,10 @@ def run_simulation():
             draw_lift(lift_left, lift_right)
 
         if run_physics:
+            drag_force, applied_point = apply_drag_force(bird.body)
+            if debug_draw_drag_force:
+                draw_drag_force(drag_force, applied_point)
+
             dv_left = bird.left_wing.body.velocity - prev_v_left
             dv_right = bird.right_wing.body.velocity - prev_v_right
             prev_v_left = bird.left_wing.body.velocity
@@ -145,8 +157,6 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 bird.re_origin()
 
-
-
         zoom.update()
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
@@ -155,9 +165,8 @@ def run_simulation():
         pygame.display.update()
 
         if run_physics:
-            apply_drag_force(bird.body, Vec2d(0, -bird.HEIGHT/2))
             space.step(DT)
-            
+
         clock.tick(FPS)
 
     pygame.quit()

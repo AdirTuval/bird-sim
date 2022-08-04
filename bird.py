@@ -1,5 +1,7 @@
 from typing import Union, Tuple
 import pymunk
+from pymunk import Vec2d
+
 from constants import *
 
 
@@ -26,6 +28,9 @@ class Bird():
         space.add(self.body, self.shape)
         self._create_left_wing(space, x_location - self.WIDTH / 2 - Wing.WIDTH / 2)
         self._create_right_wing(space, x_location + self.WIDTH / 2 + Wing.WIDTH / 2)
+
+    def tail_position(self) -> Vec2d:
+        return self.body.position + Vec2d(0, -self.HEIGHT / 2).rotated(self.body.angle)
 
     def _create_left_wing(self, space, x_location):
         self.left_wing = Wing(space, (x_location, self.HEIGHT))
