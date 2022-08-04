@@ -11,7 +11,18 @@ from constants import *
 
 pygame.init()
 
-pygame_util.positive_y_is_up = True
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+DT = 1 / FPS
+GRAVITY = -1000
+FLOOR_HEIGHT = 10
+BACKGROUND_COLOR = "white"
+AIR_MASS = 0.5
+LEFT = 0
+RIGHT = 1
+DRAG_COEFFICIENT = 0.0002
+
+pymunk.pygame_util.positive_y_is_up = True
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 bg = Background(window)
@@ -55,6 +66,22 @@ def draw_lift(lift_left: Vec2d, lift_right: Vec2d):
 def lift(m: float, dt: float, dv: Vec2d):
     down_force = m / dt * dv
     return -down_force
+
+
+def apply_drag_force(body: pymunk.Body, tail_position: Vec2d):
+    pointing_direction = Vec2d(1, 0).rotated(body.angle)
+    flight_direction = Vec2d(*body.velocity)
+    flight_direction, flight_speed = flight_direction.normalized_and_length()
+
+    dot = flight_direction.dot(pointing_direction)
+    drag_force_magnitude = (
+            (1 - abs(dot)) * flight_speed ** 2 * DRAG_COEFFICIENT * body.mass
+    )
+    body_tail_position = body.position + tail_position.rotated(body.angle)
+    body.apply_impulse_at_world_point(
+        drag_force_magnitude * -flight_direction, body_tail_position
+    )
+    body.angular_velocity *= 0.5
 
 
 def run_simulation():
@@ -118,14 +145,19 @@ def run_simulation():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 bird.re_origin()
 
+
+
         zoom.update()
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
         bird_height = pygame.font.Font(None, 16).render(str(bird.body.position[1]), True, pygame.Color("red"))
         window.blit(bird_height, (5, 20))
         pygame.display.update()
+
         if run_physics:
+            apply_drag_force(bird.body, Vec2d(0, -bird.HEIGHT/2))
             space.step(DT)
+            
         clock.tick(FPS)
 
     pygame.quit()
