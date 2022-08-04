@@ -11,7 +11,7 @@ class Bird():
     COLOR = 255, 0, 0, OPACITY
     OFFSET = 10
     ELASTICITY = 0.2
-    FRICTION = 0.4
+    FRICTION = 0.8
 
     def __init__(self, space: pymunk.Space, x_location: float) -> None:
         self.body = pymunk.Body()
