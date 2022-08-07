@@ -29,7 +29,7 @@ ______ _         _   _____ _
 """
 
 def main_play(args: argparse.Namespace) -> None:
-    BirdSim(gui=True).run_simulation()
+    BirdSim(interactive=True).run_simulation()
 
 def main_train(args: argparse.Namespace) -> None:
     if not _is_valid_output(args.output):
@@ -82,7 +82,7 @@ def arguments_parser() -> argparse.Namespace:
                                       metavar='<file>', required=True)
 
     # parser for GUI
-    parser_play = subparsers.add_parser('play', help="play online game with gui")
+    parser_play = subparsers.add_parser('play', help="play an interactive game")
     parser_play.set_defaults(func=main_play)
 
     # parser for 'policy'

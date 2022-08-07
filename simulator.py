@@ -1,5 +1,6 @@
 import sys
 from typing import Tuple
+import logging
 
 import pygame
 import pymunk
@@ -9,6 +10,8 @@ from bird import Bird
 from floor import Floor
 from background import Background
 from constants import *
+
+logger = logging.getLogger(__name__)
 
 # DEBUG PRINTS - enable only when zoom is not set.
 debug_draw_dv = False
@@ -22,7 +25,7 @@ class BirdSim():
     DT = 1 / FPS
     GRAVITY = -1000
 
-    def __init__(self, *, gui: bool = False):
+    def __init__(self, *, interactive: bool = False):
         # pymunk physics simulator
         self.space = pymunk.Space(threaded=True)
         self.space.threads = 2
@@ -30,8 +33,8 @@ class BirdSim():
         self.bird = Bird(self.space, self.WIDTH / 2)
         self.floor = Floor(self.space, self.WIDTH)
 
-        # gui
-        self.gui = True if gui else False
+        # interactive
+        self.gui = True if interactive else False
         if self.gui:
             pymunk.pygame_util.positive_y_is_up = True
             pygame.init()
@@ -183,4 +186,4 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-    sys.exit(BirdSim(gui=True).run_simulation())
+    sys.exit(BirdSim(interactive=True).run_simulation())
