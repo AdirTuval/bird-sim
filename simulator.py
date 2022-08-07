@@ -1,4 +1,5 @@
 import sys
+from collections import namedtuple
 from typing import Tuple
 import logging
 
@@ -6,7 +7,7 @@ import pygame
 import pymunk
 from pymunk import pygame_util, Vec2d
 from camera import Camera
-from bird import Bird
+from bird import Bird, BirdState
 from floor import Floor
 from background import Background
 from constants import *
@@ -34,7 +35,7 @@ class BirdSim():
         self.floor = Floor(self.space, self.WIDTH)
 
         # interactive
-        self.gui = True if interactive else False
+        self.gui = interactive
         if self.gui:
             pymunk.pygame_util.positive_y_is_up = True
             pygame.init()
@@ -105,6 +106,21 @@ class BirdSim():
             assert hasattr(self, 'policy')
             self.run_simulation_offline()
 
+    def left_wing_down(self):
+        self.bird.left_wing_down()
+
+    def right_wing_down(self):
+        self.bird.right_wing_down()
+
+    def left_wing_up(self):
+        self.bird.left_wing_up()
+
+    def right_wing_up(self):
+        self.bird.right_wing_up()
+
+    def get_state(self) -> BirdState:
+        return self.bird.get_state()
+
     def run_simulation_interactive(self):
         running = True
         run_physics = True
@@ -141,16 +157,16 @@ class BirdSim():
 
             # capture movement keys
             if pygame.key.get_pressed()[pygame.K_f]:  # Down left
-                self.bird.left_wing_down()
+                self.left_wing_down()
 
             if pygame.key.get_pressed()[pygame.K_j]:  # Down right
-                self.bird.right_wing_down()
+                self.right_wing_down()
 
             if pygame.key.get_pressed()[pygame.K_d]:  # Up left
-                self.bird.left_wing_up()
+                self.left_wing_up()
 
             if pygame.key.get_pressed()[pygame.K_k]:  # Up right
-                self.bird.right_wing_up()
+                self.right_wing_up()
 
             # capture game settings keys
             for event in pygame.event.get():

@@ -5,6 +5,51 @@ from pymunk import Vec2d
 from constants import *
 
 
+# BodyState = namedtuple('BodyState', 'position angle velocity angular_velocity')
+
+class BodyState:
+    def __init__(self, position: Vec2d, angle: float, velocity: Vec2d, angular_velocity: float):
+        self.position = position
+        self.angle = angle
+        self.velocity = velocity
+        self.angular_velocity = angular_velocity
+        self.pointing_direction = Vec2d(1, 0).rotated(angle)
+
+    def __getitem__(self, item):
+        return (self.position, self.angle, self.velocity, self.angular_velocity)[item]
+
+
+class BirdState:
+    def __init__(self, body_state: BodyState, left_wing_state: BodyState, right_wing_state: BodyState):
+        self.body_state: BodyState = body_state
+        self.left_wing_state: BodyState = left_wing_state
+        self.right_wing_state: BodyState = right_wing_state
+
+    @property
+    def body(self):
+        return self.body_state
+
+    @property
+    def left_wing(self):
+        return self.left_wing_state
+
+    @property
+    def right_wing(self):
+        return self.right_wing_state
+
+    @property
+    def x(self):
+        return self.body.position[0]
+
+    @property
+    def y(self):
+        return self.body.position[1]
+
+    @property
+    def altitude(self):
+        return self.y
+
+
 class Bird():
     WIDTH = 50
     HEIGHT = 100
@@ -18,8 +63,7 @@ class Bird():
     def __init__(self, space: pymunk.Space, x_location: float) -> None:
         self.body = pymunk.Body()
         self.body.position = x_location, self.HEIGHT / 2
-        self.origin = (self.body.position, self.body.angle,
-                       self.body.velocity, self.body.angular_velocity)
+        self.origin = BodyState(self.body.position, self.body.angle, self.body.velocity, self.body.angular_velocity)
         self.shape = pymunk.Poly.create_box(self.body, (self.WIDTH, self.HEIGHT))
         self.shape.elasticity = self.ELASTICITY
         self.shape.friction = self.FRICTION
@@ -56,6 +100,12 @@ class Bird():
     @property
     def mass(self) -> float:
         return self.shape.mass
+
+    def get_state(self) -> BirdState:
+        body_state = BodyState(self.position, self.angle, self.velocity, self.angular_velocity)
+        left_wing_state = BodyState(self.position, self.angle, self.velocity, self.angular_velocity)
+        right_wing_state = BodyState(self.position, self.angle, self.velocity, self.angular_velocity)
+        return BirdState(body_state, left_wing_state, right_wing_state)
 
     def tail_position(self) -> Vec2d:
         return self.body.position + Vec2d(0, -self.HEIGHT / 2).rotated(self.body.angle)
@@ -117,8 +167,8 @@ class Wing():
     def __init__(self, space: pymunk.Space, position: Union[pymunk.vec2d.Vec2d, Tuple[float, float]]) -> None:
         self.body = pymunk.Body()
         self.body.position = position
-        self.origin = (self.body.position, self.body.angle,
-                       self.body.velocity, self.body.angular_velocity)
+        self.origin = BodyState(self.body.position, self.body.angle,
+                                self.body.velocity, self.body.angular_velocity)
         self.shape = pymunk.Segment(self.body, (0 - self.WIDTH / 2, 0),
                                     (self.WIDTH / 2, 0), self.HEIGHT)
         self.shape.mass = self.MASS
