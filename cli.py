@@ -29,7 +29,7 @@ ______ _         _   _____ _
 """
 
 def main_play(args: argparse.Namespace) -> None:
-    BirdSim(interactive=True).run_simulation()
+    BirdSim(gui=True).run_simulation()
 
 def main_train(args: argparse.Namespace) -> None:
     if not _is_valid_output(args.output):

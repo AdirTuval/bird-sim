@@ -28,11 +28,11 @@ class BirdSim():
     DT = 1 / FPS
     GRAVITY = -1000
 
-    def __init__(self, *, interactive: bool = False, policy: np.ndarray = None):
-        if not interactive and policy is None:
-            raise AttributeError("Either interactive or policy attributes must be set")
+    def __init__(self, *, gui: bool = False, policy: np.ndarray = None):
+        if not gui and policy is None:
+            raise AttributeError("Either gui or policy attributes must be set")
 
-        if not interactive:
+        if policy is not None:
             if policy.size != TRAIN_TIME_DT:
                 raise AttributeError(f"policy must be at length of {TRAIN_TIME_DT}")
 
@@ -46,8 +46,8 @@ class BirdSim():
         # offline
         self.policy = policy
 
-        # interactive
-        self.gui = interactive
+        # gui
+        self.gui = gui
         if self.gui:
             pymunk.pygame_util.positive_y_is_up = True
             pygame.init()
@@ -108,7 +108,7 @@ class BirdSim():
         return drag_force, body.position
 
     def run_simulation(self):
-        if self.gui:
+        if self.policy is None:
             assert hasattr(self, 'window')
             assert hasattr(self, 'bg')
             assert hasattr(self, 'zoom')
@@ -220,6 +220,11 @@ class BirdSim():
         bird_altitudes = []
 
         for i in range(0, self.policy.size, 2):
+            if self.gui:
+                self.window.fill((0, 0, 0))
+                self.bg.update(self.bird.position)
+                self.bg.render()
+
             self.apply_drag_force(self.bird.body)
 
             if self.policy[i] == -1:  # Down left
@@ -236,11 +241,23 @@ class BirdSim():
 
             bird_altitudes.append(self.bird.y)
 
+
+            if self.gui:
+                self.zoom.update()
+                self.space.debug_draw(self.gui_controller)
+                bird_height = pygame.font.Font(None, 16).render(str(self.bird.y), True, pygame.Color("red"))
+                self.window.blit(self.text, (5, 5))
+                self.window.blit(bird_height, (5, 20))
+                pygame.display.update()
+
             self.space.step(self.DT)
+
+            if self.gui:
+                self.clock.tick(self.FPS)
 
         return self.bird.y, bird_altitudes
 
 
 if __name__ == '__main__':
     example_policy = np.tile(np.dstack((np.repeat(1, 50), np.repeat(-1, 50))).reshape((-1,), order='F'), 6)
-    BirdSim(policy=example_policy).run_simulation()
+    BirdSim(policy=example_policy, gui=True).run_simulation()
