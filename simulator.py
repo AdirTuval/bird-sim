@@ -1,10 +1,12 @@
 import sys
 from collections import namedtuple
-from typing import Tuple
+from typing import Tuple, Sequence
 import logging
 
+import numpy as np
 import pygame
 import pymunk
+from matplotlib import pyplot as plt
 from pymunk import pygame_util, Vec2d
 from camera import Camera
 from bird import Bird, BirdState
@@ -26,13 +28,23 @@ class BirdSim():
     DT = 1 / FPS
     GRAVITY = -1000
 
-    def __init__(self, *, interactive: bool = False):
+    def __init__(self, *, interactive: bool = False, policy: np.ndarray = None):
+        if not interactive and policy is None:
+            raise AttributeError("Either interactive or policy attributes must be set")
+
+        if not interactive:
+            if policy.size != TRAIN_TIME_DT:
+                raise AttributeError(f"policy must be at length of {TRAIN_TIME_DT}")
+
         # pymunk physics simulator
         self.space = pymunk.Space(threaded=True)
         self.space.threads = 2
         self.space.gravity = 0, GRAVITY
         self.bird = Bird(self.space, self.WIDTH / 2)
         self.floor = Floor(self.space, self.WIDTH)
+
+        # offline
+        self.policy = policy
 
         # interactive
         self.gui = interactive
@@ -104,6 +116,7 @@ class BirdSim():
             self.run_simulation_interactive()
         else:
             assert hasattr(self, 'policy')
+            assert self.policy is not None
             self.run_simulation_offline()
 
     def left_wing_down(self):
@@ -197,9 +210,37 @@ class BirdSim():
 
         pygame.quit()
 
-    def run_simulation_offline(self):
-        pass
+    def run_simulation_offline(self) -> Tuple[float, Sequence[float]]:
+        """
+        Run simulation for TRAIN_TIME_SEC seconds and return the result
+
+        Returns:
+            final altitude and altitudes graph over simulation time
+        """
+        bird_altitudes = []
+
+        for i in range(0, self.policy.size, 2):
+            self.apply_drag_force(self.bird.body)
+
+            if self.policy[i] == -1:  # Down left
+                self.left_wing_down()
+
+            if self.policy[i + 1] == -1:  # Down right
+                self.right_wing_down()
+
+            if self.policy[i] == 1:  # Up left
+                self.left_wing_up()
+
+            if self.policy[i + 1] == 1:  # Up right
+                self.right_wing_up()
+
+            bird_altitudes.append(self.bird.y)
+
+            self.space.step(self.DT)
+
+        return self.bird.y, bird_altitudes
 
 
 if __name__ == '__main__':
-    sys.exit(BirdSim(interactive=True).run_simulation())
+    example_policy = np.tile(np.dstack((np.repeat(1, 50), np.repeat(-1, 50))).reshape((-1,), order='F'), 6)
+    BirdSim(policy=example_policy).run_simulation()
