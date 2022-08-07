@@ -28,23 +28,13 @@ class BirdSim():
     DT = 1 / FPS
     GRAVITY = -1000
 
-    def __init__(self, *, gui: bool = False, policy: np.ndarray = None):
-        if not gui and policy is None:
-            raise AttributeError("Either gui or policy attributes must be set")
-
-        if policy is not None:
-            if policy.size != POLICY_LEN:
-                raise AttributeError(f"policy must be at length of {POLICY_LEN}")
-
+    def __init__(self, *, gui: bool = False):
         # pymunk physics simulator
         self.space = pymunk.Space(threaded=True)
         self.space.threads = 2
         self.space.gravity = 0, GRAVITY
         self.bird = Bird(self.space, self.WIDTH / 2)
         self.floor = Floor(self.space, self.WIDTH)
-
-        # offline
-        self.policy = policy
 
         # gui
         self.gui = gui
@@ -107,18 +97,6 @@ class BirdSim():
 
         return drag_force, body.position
 
-    def run_simulation(self):
-        if self.policy is None:
-            assert hasattr(self, 'window')
-            assert hasattr(self, 'bg')
-            assert hasattr(self, 'zoom')
-            assert hasattr(self, 'clock')
-            self.run_simulation_interactive()
-        else:
-            assert hasattr(self, 'policy')
-            assert self.policy is not None
-            self.run_simulation_offline()
-
     def left_wing_down(self):
         self.bird.left_wing_down()
 
@@ -135,6 +113,13 @@ class BirdSim():
         return self.bird.get_state()
 
     def run_simulation_interactive(self):
+        if not self.gui \
+                and hasattr(self, 'window') \
+                and hasattr(self, 'bg') \
+                and hasattr(self, 'zoom') \
+                and hasattr(self, 'clock'):
+            raise AssertionError("BirdSim was not configured to run with a GUI, try instantiate with gui.")
+
         running = True
         run_physics = True
 
@@ -210,39 +195,44 @@ class BirdSim():
 
         pygame.quit()
 
-    def run_simulation_offline(self) -> Tuple[float, Sequence[float]]:
+    def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False) -> Tuple[float, Sequence[float]]:
         """
         Run simulation for TRAIN_TIME_SEC seconds and return the result
 
         Returns:
             final altitude and altitudes graph over simulation time
         """
+        if policy.size != POLICY_LEN:
+            raise AttributeError(f"policy must be at length of {POLICY_LEN}")
+
+        if gui and not self.gui:
+            logger.warning("simulation was set to run with gui, but simulator was not instantiated with gui. Continue without gui")
+
         bird_altitudes = []
 
-        for i in range(0, self.policy.size, 2):
-            if self.gui:
+        for i in range(0, policy.size, 2):
+            if gui and self.gui:
                 self.window.fill((0, 0, 0))
                 self.bg.update(self.bird.position)
                 self.bg.render()
 
             self.apply_drag_force(self.bird.body)
 
-            if self.policy[i] == -1:  # Down left
+            if policy[i] == -1:  # Down left
                 self.left_wing_down()
 
-            if self.policy[i + 1] == -1:  # Down right
+            if policy[i + 1] == -1:  # Down right
                 self.right_wing_down()
 
-            if self.policy[i] == 1:  # Up left
+            if policy[i] == 1:  # Up left
                 self.left_wing_up()
 
-            if self.policy[i + 1] == 1:  # Up right
+            if policy[i + 1] == 1:  # Up right
                 self.right_wing_up()
 
             bird_altitudes.append(self.bird.y)
 
-
-            if self.gui:
+            if gui and self.gui:
                 self.zoom.update()
                 self.space.debug_draw(self.gui_controller)
                 bird_height = pygame.font.Font(None, 16).render(str(self.bird.y), True, pygame.Color("red"))
@@ -252,7 +242,7 @@ class BirdSim():
 
             self.space.step(self.DT)
 
-            if self.gui:
+            if gui and self.gui:
                 self.clock.tick(self.FPS)
 
         return self.bird.y, bird_altitudes
@@ -262,4 +252,5 @@ if __name__ == '__main__':
     phase_len = 50
     n_phases = int(POLICY_LEN / (phase_len * 2))
     example_policy = np.tile(np.dstack((np.repeat(1, phase_len), np.repeat(-1, phase_len))).reshape((-1,), order='F'), n_phases)
-    BirdSim(policy=example_policy, gui=True).run_simulation()
+    BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
+    # BirdSim(gui=True).run_simulation_interactive()
