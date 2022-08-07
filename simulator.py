@@ -33,8 +33,8 @@ class BirdSim():
             raise AttributeError("Either gui or policy attributes must be set")
 
         if policy is not None:
-            if policy.size != TRAIN_TIME_DT:
-                raise AttributeError(f"policy must be at length of {TRAIN_TIME_DT}")
+            if policy.size != POLICY_LEN:
+                raise AttributeError(f"policy must be at length of {POLICY_LEN}")
 
         # pymunk physics simulator
         self.space = pymunk.Space(threaded=True)
@@ -259,5 +259,7 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-    example_policy = np.tile(np.dstack((np.repeat(1, 50), np.repeat(-1, 50))).reshape((-1,), order='F'), 6)
+    phase_len = 50
+    n_phases = int(POLICY_LEN / (phase_len * 2))
+    example_policy = np.tile(np.dstack((np.repeat(1, phase_len), np.repeat(-1, phase_len))).reshape((-1,), order='F'), n_phases)
     BirdSim(policy=example_policy, gui=True).run_simulation()
