@@ -159,6 +159,8 @@ def run_simulation():
                 bird.re_origin()
 
         zoom.update()
+        if (Bird.HEIGHT - 30) / 2 <= bird.y <= (Bird.HEIGHT + 30) / 2:
+            floor.update_floor_loc(bird.x)
         space.debug_draw(draw_options)
         window.blit(text, (5, 5))
         bird_height = pygame.font.Font(None, 16).render(str(bird.y), True, pygame.Color("red"))
