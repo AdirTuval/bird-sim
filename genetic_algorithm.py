@@ -1,5 +1,7 @@
 import pygad
 import numpy as np
+import pygame
+
 from simulator import BirdSim
 import bird
 
@@ -16,10 +18,10 @@ def fitness_func(solution, solutions_index):
 
 
 num_generations = 300
-num_parents_mating = 10
+num_parents_mating = 8
 
 fitness_function = fitness_func
-sol_per_pop = 50
+sol_per_pop = 100
 num_genes = 1200
 
 init_range_low = -1
@@ -53,4 +55,6 @@ solution = ga_instance.best_solution()[0]
 print(solution)
 
 birdy = BirdSim(gui=True)
-birdy.run_simulation_offline(solution, gui=True)
+while True:
+    birdy.run_simulation_offline(solution, gui=True)
+    pygame.quit()
