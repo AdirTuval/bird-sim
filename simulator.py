@@ -4,6 +4,9 @@ from typing import Tuple, Sequence
 import logging
 
 import numpy as np
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
 import pygame
 import pymunk
 from matplotlib import pyplot as plt
@@ -249,10 +252,8 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-    phase_len = 50
-    n_phases = int(POLICY_LEN / (phase_len * 2))
-    # example_policy = np.tile(np.dstack((np.repeat(1, phase_len), np.repeat(-1, phase_len))).reshape((-1,), order='F'), n_phases)
-    with open('a.npy', 'rb') as f:
-        example_policy = np.load(f)
-    BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
-    # BirdSim(gui=True).run_simulation_interactive()
+
+    # with open('a.npy', 'rb') as f:
+    #     example_policy = np.load(f)
+    # BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
+    BirdSim(gui=True).run_simulation_interactive()

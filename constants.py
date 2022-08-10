@@ -9,6 +9,7 @@
 # Apple Inc.
 #
 from math import pi
+import numpy as np
 
 WIDTH, HEIGHT = 800, 600
 RESOLUTION = (WIDTH, HEIGHT)
@@ -41,3 +42,7 @@ TRANSLATE_SPEED = 10
 ZOOM_SPEED = 0.1
 
 HELP_TEXT = """Use A,Z to zoom. D,F - control left wing, J,K - control right wing. R for restart. Q for quit"""
+
+phase_len = 50
+n_phases = int(POLICY_LEN / (phase_len * 2))
+example_policy = np.tile(np.dstack((np.repeat(1, phase_len), np.repeat(-1, phase_len))).reshape((-1,), order='F'), n_phases)

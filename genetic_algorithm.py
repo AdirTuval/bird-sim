@@ -1,45 +1,67 @@
+import os
+from typing import Mapping, Callable, Tuple, Any, Dict
+
 import pygad
 import numpy as np
-import pygame
 
 from simulator import BirdSim
-import bird
 
 
-def callback_gen(ga_instance):
-    print("Generation : ", ga_instance.generations_completed)
-    print("Fitness of the best solution :", ga_instance.best_solution()[1])
+class GeneticAlgo():
+    def __init__(self, num_generations=300,
+                 num_parents_mating=50,
+                 fitness_func: Callable = None,
+                 sol_per_pop=1000,
+                 num_genes=1200,
+                 init_range_low=-1,
+                 init_range_high=1,
+                 gene_space=(-1, 0, 1),
+                 parent_selection_type='sss',
+                 keep_parents=1,
+                 crossover_type='single_point',
+                 mutation_type='random',
+                 mutation_percent_genes=10,
+                 callback_generation: Callable = None,
+                 parallel_processing: Tuple[str, int] = ('process', int(os.cpu_count() * 0.7))):
+        self.params: Dict = {'num_generations': num_generations,
+                                'num_parents_mating': num_parents_mating,
+                                'fitness_func': fitness_func if fitness_func else self.fitness_func,
+                                'sol_per_pop': sol_per_pop,
+                                'num_genes': num_genes,
+                                'init_range_low': init_range_low,
+                                'init_range_high': init_range_high,
+                                'gene_space': gene_space,
+                                'parent_selection_type': parent_selection_type,
+                                'keep_parents': keep_parents,
+                                'crossover_type': crossover_type,
+                                'mutation_type': mutation_type,
+                                'mutation_percent_genes': mutation_percent_genes,
+                                'callback_generation': callback_generation if callback_generation else self.callback_gen,
+                                'parallel_processing': parallel_processing}
+
+    @staticmethod
+    def callback_gen(ga_instance):
+        print("Generation : ", ga_instance.generations_completed)
+        print("Fitness of the best solution :", ga_instance.best_solution()[1])
+
+    @staticmethod
+    def fitness_func(solution, solutions_index):
+        bird_sim = BirdSim()
+        altitude, _ = bird_sim.run_simulation_offline(solution)
+        return altitude
+
+    def run(self, filename: os.PathLike = 'out/ga.npy') -> Tuple[Any, None, Any]:
+        ga_instance = pygad.GA(**self.params)
+        ga_instance.run()
+        ga_instance.plot_fitness()
+        solution = ga_instance.best_solution()[0]
+        self.save_results(solution, filename)
+
+        return ga_instance.best_solution()
+
+    def save_results(self, solution: np.ndarray, filename: os.PathLike):
+        np.save(filename, solution)
 
 
-def fitness_func(solution, solutions_index):
-    bird_sim = BirdSim()
-    altitude, _ = bird_sim.run_simulation_offline(solution)
-    return altitude
-
-
-params = {'num_generations': 300,
-          'num_parents_mating': 50,
-          'fitness_func': fitness_func,
-          'sol_per_pop': 1000,
-          'num_genes': 1200,
-          'init_range_low': -1,
-          'init_range_high': 1,
-          'gene_space': range(-1, 2),
-          'parent_selection_type': 'sss',
-          'keep_parents': 1,
-          'crossover_type': 'single_point',
-          'mutation_type': 'random',
-          'mutation_percent_genes': 10,
-          'callback_generation': callback_gen}
-
-ga_instance = pygad.GA(**params)
-ga_instance.run()
-ga_instance.plot_fitness()
-solution = ga_instance.best_solution()[0]
-with open('a.npy', 'wb') as f:
-    np.save(f, solution)
-
-# birdy = BirdSim(gui=True)
-# while True:
-#     birdy.run_simulation_offline(solution, gui=True)
-#     pygame.quit()
+if __name__ == '__main__':
+    GeneticAlgo().run()

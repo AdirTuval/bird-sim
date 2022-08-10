@@ -5,10 +5,14 @@ import os
 import shlex
 import sys
 import logging
+import time
 from pathlib import Path
 from typing import Tuple
 
+import numpy as np
+
 from simulator import BirdSim
+from genetic_algorithm import GeneticAlgo
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +32,40 @@ ______ _         _   _____ _
 \____/|_|_|  \__,_| \____/|_|_| |_| |_|
 """
 
+
 def main_play(args: argparse.Namespace) -> None:
-    BirdSim(gui=True).run_simulation()
+    BirdSim(gui=True).run_simulation_interactive()
+
 
 def main_train(args: argparse.Namespace) -> None:
     if not _is_valid_output(args.output):
         raise NotADirectoryError(f"Failed to locate the directory for output file: '{args.output}'")
 
+    if args.algorithm == 'GA':
+        ga_runner = GeneticAlgo()
+
+        if args.cpu:
+            ga_runner.params['parallel_processing'] = ('process', args.cpu)
+        if args.generations:
+            ga_runner.params['num_generations'] = args.generations
+
+        ga_runner.run(args.output)
+
+    elif args.algorithm == 'RL':
+        pass  # TODO: add RL algo training
+
+
 def main_policy(args: argparse.Namespace) -> None:
     if not _is_valid_file(args.input_file):
         raise FileNotFoundError(f"Failed to locate policy file: '{args.input_file}'")
+
+    bird_sim = BirdSim(gui=True)
+
+    policy = np.load(args.input_file)
+
+    bird_sim.run_simulation_offline(policy, gui=True)
+
+
 
 def _is_valid_file(file_path: str) -> bool:
     """
@@ -72,14 +100,17 @@ def arguments_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog=PROGRAM_NAME, description=TITLE + '\n' + DESCRIPTION, epilog=EPILOG,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-v', '--version', action="version", version=f'{PROGRAM_NAME.title()} {VERSION}')
-    parser.add_argument('-l', '--loglevel', type=str, action="store", help="set logging level")
+    parser.add_argument('-l', '--loglevel', type=str, action="store", default='info', help="set logging level")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # parser for training the bird agent
     parser_train = subparsers.add_parser('train', help="train the bird")
-    parser_train.set_defaults(func=main_train)
+    parser_train.add_argument('-a', '--algorithm', type=str, choices=['GA', 'RL'], action='store', help='algorithm to use for training', required=True)
     parser_train.add_argument('-o', '--output', type=str, action='store', help='write output policy to <file> path',
-                                      metavar='<file>', required=True)
+                              metavar='<file>', required=True)
+    parser_train.add_argument('--cpu', type=int, choices=list(range(1, os.cpu_count())), action='store', help='number of parallel processes to use')
+    parser_train.add_argument('-g', '--generations', type=int, action='store', help='number of generations', default=300)
+    parser_train.set_defaults(func=main_train)
 
     # parser for GUI
     parser_play = subparsers.add_parser('play', help="play an interactive game")
@@ -89,7 +120,7 @@ def arguments_parser() -> argparse.Namespace:
     parser_policy = subparsers.add_parser('policy', help="show policy")
     parser_policy.set_defaults(func=main_policy)
     parser_policy.add_argument('input_file', type=str, action='store', help="path to .policy input file",
-                             metavar='<policy file>')
+                               metavar='<policy file>')
 
     return parser.parse_args(sys.argv[1:])
 
@@ -101,10 +132,15 @@ def main():
     """
     args = arguments_parser()
     print(TITLE)
+    numeric_level = getattr(logging, args.loglevel.upper(), None)
+    logging.basicConfig(level=numeric_level)
     logger.debug(args)
 
     return args.func(args)  # call the subcommand method
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    start_time = time.perf_counter()
+    main()
+    elapsed = round((time.perf_counter() - start_time) / 60, 2)  # minutes
+    logger.info(f"Elapsed time: {elapsed} minuets")

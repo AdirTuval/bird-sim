@@ -55,7 +55,7 @@ class Bird():
     HEIGHT = 100
     MASS = 5
     OPACITY = 100
-    COLOR = 255, 0, 0, OPACITY
+    COLOR = RED
     OFFSET = 10
     ELASTICITY = 0.2
     FRICTION = 0.8
