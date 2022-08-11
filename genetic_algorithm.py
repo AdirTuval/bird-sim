@@ -8,6 +8,9 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
+    CURR_STATE_PATH = 'out/ga.npy'
+    FINAL_SOL_PATH = 'geneticAlgState'
+
     def __init__(self, num_generations=300,
                  num_parents_mating=50,
                  fitness_func: Callable = None,
@@ -24,43 +27,44 @@ class GeneticAlgo():
                  callback_generation: Callable = None,
                  parallel_processing: Tuple[str, int] = ('process', int(os.cpu_count() * 0.7))):
         self.params: Dict = {'num_generations': num_generations,
-                                'num_parents_mating': num_parents_mating,
-                                'fitness_func': fitness_func if fitness_func else self.fitness_func,
-                                'sol_per_pop': sol_per_pop,
-                                'num_genes': num_genes,
-                                'init_range_low': init_range_low,
-                                'init_range_high': init_range_high,
-                                'gene_space': gene_space,
-                                'parent_selection_type': parent_selection_type,
-                                'keep_parents': keep_parents,
-                                'crossover_type': crossover_type,
-                                'mutation_type': mutation_type,
-                                'mutation_percent_genes': mutation_percent_genes,
-                                'callback_generation': callback_generation if callback_generation else self.callback_gen,
-                                'parallel_processing': parallel_processing}
+                             'num_parents_mating': num_parents_mating,
+                             'fitness_func': fitness_func if fitness_func else self.fitness_func,
+                             'sol_per_pop': sol_per_pop,
+                             'num_genes': num_genes,
+                             'init_range_low': init_range_low,
+                             'init_range_high': init_range_high,
+                             'gene_space': gene_space,
+                             'parent_selection_type': parent_selection_type,
+                             'keep_parents': keep_parents,
+                             'crossover_type': crossover_type,
+                             'mutation_type': mutation_type,
+                             'mutation_percent_genes': mutation_percent_genes,
+                             'callback_generation': callback_generation if callback_generation else self.callback_gen,
+                             'parallel_processing': parallel_processing}
 
     @staticmethod
-    def callback_gen(ga_instance):
-        print("Generation : ", ga_instance.generations_completed)
-        print("Fitness of the best solution :", ga_instance.best_solution()[1])
-
-    @staticmethod
-    def fitness_func(solution, solutions_index):
+    def fitness_func(solution: np.ndarray, solutions_index) -> float:
         bird_sim = BirdSim()
         altitude, _ = bird_sim.run_simulation_offline(solution)
         return altitude
 
-    def run(self, filename: os.PathLike = 'out/ga.npy') -> Tuple[Any, None, Any]:
+    @staticmethod
+    def callback_gen(ga_instance: pygad.GA):
+        print("Generation : ", ga_instance.generations_completed)
+        print("Fitness of the best solution :", ga_instance.best_solution()[1])
+        if ga_instance.generations_completed % 10 == 0:
+            ga_instance.save(GeneticAlgo.CURR_STATE_PATH)
+
+    def run(self) -> Tuple[Any, None, Any]:
         ga_instance = pygad.GA(**self.params)
         ga_instance.run()
         ga_instance.plot_fitness()
         solution = ga_instance.best_solution()[0]
-        self.save_results(solution, filename)
-
+        self.save_results(solution)
         return ga_instance.best_solution()
 
-    def save_results(self, solution: np.ndarray, filename: os.PathLike):
-        np.save(filename, solution)
+    def save_results(self, solution: np.ndarray):
+        np.save(GeneticAlgo.FINAL_SOL_PATH, solution)
 
 
 if __name__ == '__main__':
