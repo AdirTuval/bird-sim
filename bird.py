@@ -139,7 +139,7 @@ class Bird():
 
     def right_wing_down(self):
         self.right_wing.down()
-        if self._is_left_wing_pos_valid_for_force_application():
+        if self._is_right_wing_pos_valid_for_force_application():
             self.body.apply_force_at_local_point((-100, 20000), (0, 0))
 
     def left_wing_up(self):
