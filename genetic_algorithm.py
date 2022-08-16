@@ -8,8 +8,7 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
-    CURR_STATE_PATH = 'out/ga.npy'
-    FINAL_SOL_PATH = 'geneticAlgState'
+    SOLUTION_CURR = 'out/ga.npy'
 
     def __init__(self, num_generations=300,
                  num_parents_mating=50,
@@ -49,22 +48,23 @@ class GeneticAlgo():
         return altitude
 
     @staticmethod
+    def save_results(solution: np.ndarray):
+        np.save(GeneticAlgo.SOLUTION_CURR, solution)
+
+    @staticmethod
     def callback_gen(ga_instance: pygad.GA):
         print("Generation : ", ga_instance.generations_completed)
         print("Fitness of the best solution :", ga_instance.best_solution()[1])
         if ga_instance.generations_completed % 10 == 0:
-            ga_instance.save(GeneticAlgo.CURR_STATE_PATH)
+            GeneticAlgo.save_results(ga_instance.best_solution()[0])
 
     def run(self) -> Tuple[Any, None, Any]:
         ga_instance = pygad.GA(**self.params)
         ga_instance.run()
         ga_instance.plot_fitness()
         solution = ga_instance.best_solution()[0]
-        self.save_results(solution)
+        GeneticAlgo.save_results(solution)
         return ga_instance.best_solution()
-
-    def save_results(self, solution: np.ndarray):
-        np.save(GeneticAlgo.FINAL_SOL_PATH, solution)
 
 
 if __name__ == '__main__':
