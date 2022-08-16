@@ -205,6 +205,9 @@ class BirdSim():
         Returns:
             final altitude and altitudes graph over simulation time
         """
+        policy = policy.reshape((120, 2))
+        policy = np.repeat(policy, 5, axis=0)
+        policy = policy.reshape(1200)
         if policy.size != POLICY_LEN:
             raise AttributeError(f"policy must be at length of {POLICY_LEN}")
 

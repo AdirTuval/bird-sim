@@ -9,12 +9,13 @@ from simulator import BirdSim
 
 class GeneticAlgo():
     SOLUTION_CURR = 'out/ga.npy'
+    bird_sim = BirdSim()
 
     def __init__(self, num_generations=300,
                  num_parents_mating=50,
                  fitness_func: Callable = None,
                  sol_per_pop=1000,
-                 num_genes=1200,
+                 num_genes=240,
                  init_range_low=-1,
                  init_range_high=1,
                  gene_space=(-1, 0, 1),
@@ -43,6 +44,9 @@ class GeneticAlgo():
 
     @staticmethod
     def fitness_func(solution: np.ndarray, solutions_index) -> float:
+        solution = solution.reshape((120, 2))
+        solution = np.repeat(solution, 5, axis=0)
+        solution = solution.reshape(1200)
         bird_sim = BirdSim()
         altitude, _ = bird_sim.run_simulation_offline(solution)
         return altitude
