@@ -19,7 +19,7 @@ class GeneticAlgo():
                  init_range_high=1,
                  gene_space=(-1, 0, 1),
                  parent_selection_type='sss',
-                 keep_parents=1,
+                 keep_parents=-1,
                  crossover_type='single_point',
                  mutation_type='random',
                  mutation_percent_genes=10,
