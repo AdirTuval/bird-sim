@@ -8,14 +8,14 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
-    SOLUTION_CURR = 'out/ga.npy'
+    SOLUTION_CURR = 'out/ga_'
     bird_sim = BirdSim()
 
-    def __init__(self, num_generations=300,
+    def __init__(self, num_generations=600,
                  num_parents_mating=50,
                  fitness_func: Callable = None,
-                 sol_per_pop=1000,
-                 num_genes=240,
+                 sol_per_pop=2000,
+                 num_genes=120,
                  init_range_low=-1,
                  init_range_high=1,
                  gene_space=(-1, 0, 1),
@@ -44,30 +44,30 @@ class GeneticAlgo():
 
     @staticmethod
     def fitness_func(solution: np.ndarray, solutions_index) -> float:
-        solution = solution.reshape((120, 2))
-        solution = np.repeat(solution, 5, axis=0)
+        solution = solution.reshape((60, 2))
+        solution = np.repeat(solution, 10, axis=0)
         solution = solution.reshape(1200)
         bird_sim = BirdSim()
         altitude, _ = bird_sim.run_simulation_offline(solution)
         return altitude
 
     @staticmethod
-    def save_results(solution: np.ndarray):
-        np.save(GeneticAlgo.SOLUTION_CURR, solution)
+    def save_results(solution: np.ndarray, generation: int):
+        np.save(f'{GeneticAlgo.SOLUTION_CURR}{generation}.npy', solution)
 
     @staticmethod
     def callback_gen(ga_instance: pygad.GA):
         print("Generation : ", ga_instance.generations_completed)
         print("Fitness of the best solution :", ga_instance.best_solution()[1])
         if ga_instance.generations_completed % 10 == 0:
-            GeneticAlgo.save_results(ga_instance.best_solution()[0])
+            GeneticAlgo.save_results(ga_instance.best_solution()[0], ga_instance.generations_completed)
 
     def run(self) -> Tuple[Any, None, Any]:
         ga_instance = pygad.GA(**self.params)
         ga_instance.run()
         ga_instance.plot_fitness()
         solution = ga_instance.best_solution()[0]
-        GeneticAlgo.save_results(solution)
+        GeneticAlgo.save_results(solution, ga_instance.generations_completed)
         return ga_instance.best_solution()
 
 

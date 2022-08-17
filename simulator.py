@@ -205,11 +205,14 @@ class BirdSim():
         Returns:
             final altitude and altitudes graph over simulation time
         """
-        policy = policy.reshape((120, 2))
-        policy = np.repeat(policy, 5, axis=0)
-        policy = policy.reshape(1200)
+
         if policy.size != POLICY_LEN:
-            raise AttributeError(f"policy must be at length of {POLICY_LEN}")
+            try:
+                policy = policy.reshape((60, 2))
+                policy = np.repeat(policy, 10, axis=0)
+                policy = policy.reshape(1200)
+            except:
+                raise AttributeError(f"policy must be at length of {POLICY_LEN}")
 
         if gui and not self.gui:
             logger.warning("simulation was set to run with gui, but simulator was not instantiated with gui. Continue without gui")
@@ -256,7 +259,7 @@ class BirdSim():
 
 if __name__ == '__main__':
 
-    with open('out/ga.npy', 'rb') as f:
+    with open('out/ga_590.npy', 'rb') as f:
         example_policy = np.load(f)
     BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
     # BirdSim(gui=True).run_simulation_interactive()
