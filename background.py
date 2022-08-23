@@ -24,8 +24,8 @@ class Background():
 
         self.i += 1
         self.i %= 100
-        if self.i == 0:
-            print(bottom_limit, left_limit)
+        # if self.i == 0: #uncoment for debuuging
+        #     print(bottom_limit, left_limit)
 
         self.rects_to_draw = []
         for i, j in product([0,1,2], [-1,0,1]):
