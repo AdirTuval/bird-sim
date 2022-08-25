@@ -8,7 +8,7 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
-    SOLUTION_CURR = 'out/ga_'
+    SOLUTION_CURR = 'out/ga3_'
     bird_sim = BirdSim()
 
     def __init__(self, num_generations=600,
@@ -59,7 +59,7 @@ class GeneticAlgo():
     def callback_gen(ga_instance: pygad.GA):
         print("Generation : ", ga_instance.generations_completed)
         print("Fitness of the best solution :", ga_instance.best_solution()[1])
-        if ga_instance.generations_completed % 10 == 0:
+        if ga_instance.generations_completed % 5 == 0:
             GeneticAlgo.save_results(ga_instance.best_solution()[0], ga_instance.generations_completed)
 
     def run(self) -> Tuple[Any, None, Any]:
@@ -67,7 +67,7 @@ class GeneticAlgo():
         ga_instance.run()
         ga_instance.plot_fitness()
         solution = ga_instance.best_solution()[0]
-        GeneticAlgo.save_results(solution, ga_instance.generations_completed)
+        GeneticAlgo.save_results(solution, ga_instance.num_generations)
         return ga_instance.best_solution()
 
 

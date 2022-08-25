@@ -9,6 +9,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
 import pymunk
+import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt
 from pymunk import pygame_util, Vec2d
 from camera import Camera
@@ -215,8 +216,8 @@ class BirdSim():
         if policy.size != POLICY_LEN:
             try:
                 policy = policy.reshape((60, 2))
-                policy = np.repeat(policy, 10, axis=0)
-                policy = policy.reshape(1200)
+                policy = np.repeat(policy, 20, axis=0)
+                policy = policy.reshape(2400)
             except:
                 raise AttributeError(f"policy must be at length of {POLICY_LEN}")
 
@@ -264,8 +265,18 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-
-    # with open('out/ql.npy', 'rb') as f:
-    #     example_policy = np.load(f)
-    # BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
-    BirdSim(gui=True).run_simulation_interactive()
+    points = {}
+    last_height = {}
+    for i in range(10, 1000, 10):
+        with open('out/ql_' + str(i) + '.npy', 'rb') as f:
+            example_policy = np.load(f)
+        # points[i] = max(BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[1])
+        last_height[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
+        print("for state [" + str(i) + "], last height=" +str(last_height[i]) + "and policy=" + str(example_policy))
+        print()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    # ax1.scatter(points.keys(), points.values(), s=10, c='b', marker="s", label='max height')
+    ax1.scatter(last_height.keys(), last_height.values(), s=10, c='r', marker="o", label='last height')
+    plt.legend(loc='upper left')
+    plt.show()

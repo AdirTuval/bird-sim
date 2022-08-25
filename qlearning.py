@@ -93,28 +93,30 @@ class BirdQLearner(GreedyQLearning):
     @staticmethod
     def wing_gain(w_pos_t, w_pos_t_1):
         if w_pos_t == 0 and w_pos_t_1 == 1:
-            return 1000
+            return -1
         elif w_pos_t == 0 and w_pos_t_1 == 0:
-            return -100
+            return -1
         elif w_pos_t == 0 and w_pos_t_1 == -1:
-            return 1000
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == 1:
-            return -100
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == 0:
-            return -500
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == -1:
-            return 1000
+            return 10
         elif w_pos_t == -1 and w_pos_t_1 == 1:
-            return 1000
+            return 10
         elif w_pos_t == -1 and w_pos_t_1 == 0:
-            return -500
+            return -1
         elif w_pos_t == -1 and w_pos_t_1 == -1:
-            return -100
+            return -1
 
     @staticmethod
     def get_reward(state, action):
         rt, rt_1 = 0, 0
         lt, lt_1 = 0, 0
+        # if action[1] != action[4]:
+        #     return -1
         if state[1] == 'u':
             rt = 1
         elif state[1] == 'd':
@@ -139,11 +141,11 @@ class BirdQLearner(GreedyQLearning):
     def observe_reward_value(self, state_key, action_key):
         return self.get_reward(state_key, action_key)
 
-    def visualize_learning_result(self, state_key):
+    def get_policy(self, state_key):
         policy = []
         for i in range(BirdQLearner.POLICY_LEN):
             actions = self.extract_possible_actions(state_key)
-            action = self.select_action(state_key, actions)
+            action = self.predict_next_action(state_key, actions)
             rw, lw = 0, 0
             if action[1] == 'u':
                 rw = 1
@@ -157,9 +159,15 @@ class BirdQLearner(GreedyQLearning):
             state_key = self.update_state(state_key, action)
         return np.array(policy)
 
+    def visualize_learning_result(self, state_key):
+        if self.t % 10 == 0:
+            policy = self.get_policy('rd_ld')
+            np.save(f'out/ql_{self.t}.npy', policy)
+
 
 if __name__ == '__main__':
     bird_learner = BirdQLearner()
-    bird_learner.learn('rd_ld', 10000)
-    policy = bird_learner.visualize_learning_result('rd_ld')
+    bird_learner.set_alpha_value(0.01)
+    bird_learner.learn('rd_ld', 1000)
+    policy = bird_learner.get_policy('rd_ld')
     np.save('out/ql.npy', policy)
