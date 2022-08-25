@@ -115,8 +115,8 @@ class BirdQLearner(GreedyQLearning):
     def get_reward(state, action):
         rt, rt_1 = 0, 0
         lt, lt_1 = 0, 0
-        # if action[1] != action[4]:
-        #     return -1
+        if action[1] != action[4]:
+            return -1
         if state[1] == 'u':
             rt = 1
         elif state[1] == 'd':
@@ -168,6 +168,6 @@ class BirdQLearner(GreedyQLearning):
 if __name__ == '__main__':
     bird_learner = BirdQLearner()
     bird_learner.set_alpha_value(0.01)
-    bird_learner.learn('rd_ld', 1000)
+    bird_learner.learn('rd_ld', 2000)
     policy = bird_learner.get_policy('rd_ld')
     np.save('out/ql.npy', policy)

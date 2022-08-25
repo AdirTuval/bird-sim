@@ -114,7 +114,7 @@ class Bird():
         self.left_wing = Wing(space, (x_location, self.HEIGHT))
         constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body,
                                             (-self.WIDTH / 2 - self.OFFSET, self.HEIGHT / 2), (Wing.WIDTH / 2, 0))
-        limit_left = pymunk.RotaryLimitJoint(self.body, self.left_wing.body, -PI / 2, PI)
+        limit_left = pymunk.RotaryLimitJoint(self.body, self.left_wing.body, -50 * PI / 180, PI)
         space.add(limit_left)
         space.add(constraint_left)
 
@@ -122,7 +122,7 @@ class Bird():
         self.right_wing = Wing(space, (x_location, self.HEIGHT))
         constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body,
                                              (self.WIDTH / 2 + self.OFFSET, self.HEIGHT / 2), (-Wing.WIDTH / 2, 0))
-        limit_right = pymunk.RotaryLimitJoint(self.body, self.right_wing.body, -PI, PI / 2)
+        limit_right = pymunk.RotaryLimitJoint(self.body, self.right_wing.body, -PI, 50 * PI / 180)
         space.add(limit_right)
         space.add(constraint_right)
 
@@ -135,12 +135,12 @@ class Bird():
     def left_wing_down(self):
         self.left_wing.down()
         if self._is_left_wing_pos_valid_for_force_application():
-            self.body.apply_force_at_local_point((100, 16000), (0, 0))
+            self.body.apply_force_at_local_point((100, 20000), (0, 0))
 
     def right_wing_down(self):
         self.right_wing.down()
         if self._is_right_wing_pos_valid_for_force_application():
-            self.body.apply_force_at_local_point((-100, 16000), (0, 0))
+            self.body.apply_force_at_local_point((-100, 20000), (0, 0))
 
     def left_wing_up(self):
         self.left_wing.up()
@@ -160,7 +160,8 @@ class Wing():
     HEIGHT = 6
     WING_AREA = WIDTH * HEIGHT
     MASS = 2
-    STRENGTH = 3000
+    STRENGTH_UP = 3000
+    STRENGTH_DOWN = 0
     FRICTION = 0.7
     ELASTICITY = 0.2
 
@@ -178,10 +179,10 @@ class Wing():
         space.add(self.body, self.shape)
 
     def down(self):
-        self.body.apply_force_at_local_point((0, -self.STRENGTH))
+        self.body.apply_force_at_local_point((0, self.STRENGTH_DOWN))
 
     def up(self):
-        self.body.apply_force_at_local_point((0, self.STRENGTH))
+        self.body.apply_force_at_local_point((0, self.STRENGTH_UP))
 
     def re_origin(self):
         (self.body.position, self.body.angle,

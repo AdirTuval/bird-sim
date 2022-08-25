@@ -8,7 +8,7 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
-    SOLUTION_CURR = 'out/ga3_'
+    SOLUTION_CURR = 'out/ga4_'
     bird_sim = BirdSim()
 
     def __init__(self, num_generations=600,
