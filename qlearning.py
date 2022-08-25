@@ -93,30 +93,30 @@ class BirdQLearner(GreedyQLearning):
     @staticmethod
     def wing_gain(w_pos_t, w_pos_t_1):
         if w_pos_t == 0 and w_pos_t_1 == 1:
-            return -10
+            return -1
         elif w_pos_t == 0 and w_pos_t_1 == 0:
-            return -10
+            return -1
         elif w_pos_t == 0 and w_pos_t_1 == -1:
-            return -10
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == 1:
-            return -10
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == 0:
-            return -10
+            return -1
         elif w_pos_t == 1 and w_pos_t_1 == -1:
-            return 50
+            return 10
         elif w_pos_t == -1 and w_pos_t_1 == 1:
-            return 50
+            return 10
         elif w_pos_t == -1 and w_pos_t_1 == 0:
-            return -10
+            return -1
         elif w_pos_t == -1 and w_pos_t_1 == -1:
-            return -10
+            return -1
 
     @staticmethod
     def get_reward(state, action):
         rt, rt_1 = 0, 0
         lt, lt_1 = 0, 0
         if action[1] != action[4]:
-            return -10
+            return -1
         if state[1] == 'u':
             rt = 1
         elif state[1] == 'd':
