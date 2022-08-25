@@ -261,16 +261,16 @@ class BirdSim():
 if __name__ == '__main__':
     points = {}
     last_height = {}
-    for i in range(5, 600, 5):
-        with open('out/ga3_' + str(i) + '.npy', 'rb') as f:
+    for i in range(10, 1000, 10):
+        with open('out/ql_' + str(i) + '.npy', 'rb') as f:
             example_policy = np.load(f)
-        points[i] = max(BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[1])
+        # points[i] = max(BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[1])
         last_height[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
-        # print("for state [" + str(i) + "], last height=" +str(last_height[i]))
-        # print()
+        print("for state [" + str(i) + "], last height=" +str(last_height[i]) + "and policy=" + str(example_policy))
+        print()
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    ax1.scatter(points.keys(), points.values(), s=10, c='b', marker="s", label='max height')
+    # ax1.scatter(points.keys(), points.values(), s=10, c='b', marker="s", label='max height')
     ax1.scatter(last_height.keys(), last_height.values(), s=10, c='r', marker="o", label='last height')
     plt.legend(loc='upper left')
     plt.show()
