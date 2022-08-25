@@ -258,8 +258,11 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-
-    with open('out/ga_590.npy', 'rb') as f:
+    alts = {}
+    with open(f'out/ga3_600.npy', 'rb') as f:
         example_policy = np.load(f)
-    BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
-    # BirdSim(gui=True).run_simulation_interactive()
+        BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
+        # BirdSim(gui=True).run_simulation_interactive()
+
+
+

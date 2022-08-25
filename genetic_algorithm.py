@@ -8,7 +8,7 @@ from simulator import BirdSim
 
 
 class GeneticAlgo():
-    SOLUTION_CURR = 'out/ga2_'
+    SOLUTION_CURR = 'out/ga3_'
     bird_sim = BirdSim()
 
     def __init__(self, num_generations=600,
@@ -45,8 +45,8 @@ class GeneticAlgo():
     @staticmethod
     def fitness_func(solution: np.ndarray, solutions_index) -> float:
         solution = solution.reshape((60, 2))
-        solution = np.repeat(solution, 20, axis=0)
-        solution = solution.reshape(2400)
+        solution = np.repeat(solution, 10, axis=0)
+        solution = solution.reshape(1200)
         bird_sim = BirdSim()
         altitude, _ = bird_sim.run_simulation_offline(solution)
         return altitude
@@ -59,7 +59,7 @@ class GeneticAlgo():
     def callback_gen(ga_instance: pygad.GA):
         print("Generation : ", ga_instance.generations_completed)
         print("Fitness of the best solution :", ga_instance.best_solution()[1])
-        if ga_instance.generations_completed % 10 == 0:
+        if ga_instance.generations_completed % 5 == 0:
             GeneticAlgo.save_results(ga_instance.best_solution()[0], ga_instance.generations_completed)
 
     def run(self) -> Tuple[Any, None, Any]:

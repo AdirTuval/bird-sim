@@ -159,6 +159,11 @@ class BirdQLearner(GreedyQLearning):
             state_key = self.update_state(state_key, action)
         return np.array(policy)
 
+    def visualize_learning_result(self, state_key):
+        if self.t % 10 == 0:
+            policy = self.get_policy('rd_rd')
+            np.save(f'out/ql_{self.t}.npy', policy)
+
 
 if __name__ == '__main__':
     bird_learner = BirdQLearner()
