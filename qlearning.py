@@ -115,8 +115,8 @@ class BirdQLearner(GreedyQLearning):
     def get_reward(state, action):
         rt, rt_1 = 0, 0
         lt, lt_1 = 0, 0
-        if action[1] != action[4]:
-            return -1
+        # if action[1] != action[4]:
+        #     return -1
         if state[1] == 'u':
             rt = 1
         elif state[1] == 'd':
