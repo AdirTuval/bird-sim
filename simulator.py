@@ -137,6 +137,8 @@ class BirdSim():
             self.window.fill((0, 0, 0))
             self.bg.update(self.bird.position)
             self.bg.render()
+            self.floor.render(self.window, self.bird.y)
+            self.bird.render(self.window)
 
             if debug_draw_dv:
                 self.draw_dv(dv_left, dv_right)
@@ -185,8 +187,12 @@ class BirdSim():
                     self.bird.re_origin()
 
             self.zoom.update()
-            self.space.debug_draw(self.gui_controller)
-            bird_height = pygame.font.Font(None, 16).render(str(self.bird.y), True, pygame.Color("red"))
+            # self.space.debug_draw(self.gui_controller)
+            
+            bird_height = pygame.font.Font(None, 16).render(str(f'{self.bird.y:.3f}'), True, pygame.Color("red"))
+            bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
+
+            self.window.blit(bird_angle,(5,40))
             self.window.blit(self.text, (5, 5))
             self.window.blit(bird_height, (5, 20))
             pygame.display.update()
@@ -244,7 +250,7 @@ class BirdSim():
             if gui and self.gui:
                 self.zoom.update()
                 self.space.debug_draw(self.gui_controller)
-                bird_height = pygame.font.Font(None, 16).render(str(self.bird.y), True, pygame.Color("red"))
+                bird_height = pygame.font.Font(None, 16).render(f"{self.bird.y:.3f}", True, pygame.Color("red"))
                 self.window.blit(self.text, (5, 5))
                 self.window.blit(bird_height, (5, 20))
                 pygame.display.update()
@@ -259,7 +265,7 @@ class BirdSim():
 
 if __name__ == '__main__':
 
-    with open('out/ql.npy', 'rb') as f:
-        example_policy = np.load(f)
-    BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
-    # BirdSim(gui=True).run_simulation_interactive()
+    # with open('out/ql.npy', 'rb') as f:
+    #     example_policy = np.load(f)
+    # BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
+    BirdSim(gui=True).run_simulation_interactive()

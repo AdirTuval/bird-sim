@@ -1,11 +1,15 @@
+import imp
+from turtle import right
 from typing import Union, Tuple
 import pymunk
 from pymunk import Vec2d
-
+import pygame
 from constants import *
-
-
+from draw_blits import blitRotate
+import math 
 # BodyState = namedtuple('BodyState', 'position angle velocity angular_velocity')
+LEFT = 'left'
+RIGHT = 'right'
 
 class BodyState:
     def __init__(self, position: Vec2d, angle: float, velocity: Vec2d, angular_velocity: float):
@@ -61,10 +65,12 @@ class Bird():
     FRICTION = 0.8
 
     def __init__(self, space: pymunk.Space, x_location: float) -> None:
+        self.image = pygame.image.load('assets/body.png')
+        self.image = pygame.transform.scale(self.image, (100,100))
         self.body = pymunk.Body()
         self.body.position = x_location, self.HEIGHT / 2
         self.origin = BodyState(self.body.position, self.body.angle, self.body.velocity, self.body.angular_velocity)
-        self.shape = pymunk.Poly.create_box(self.body, (self.WIDTH, self.HEIGHT))
+        self.shape = pymunk.Poly.create_box(self.body,self.size)
         self.shape.elasticity = self.ELASTICITY
         self.shape.friction = self.FRICTION
         self.shape.mass = self.MASS
@@ -72,6 +78,18 @@ class Bird():
         space.add(self.body, self.shape)
         self._create_left_wing(space, x_location - self.WIDTH / 2 - Wing.WIDTH / 2)
         self._create_right_wing(space, x_location + self.WIDTH / 2 + Wing.WIDTH / 2)
+
+    def render(self, screen):
+        image_to_display = self.image.copy()
+        self.right_wing.render(image_to_display,self.angle_deg)
+        self.left_wing.render(image_to_display,self.angle_deg)
+        w, h = image_to_display.get_size()
+        blitRotate(screen, image_to_display, (400,350), (w/2, h/2), self.angle_deg)
+
+    @property
+    def angle_deg(self) -> float:
+        return math.degrees(self.body.angle)
+
 
     @property
     def x(self) -> float:
@@ -86,8 +104,14 @@ class Bird():
         return self.body.position
 
     @property
+    def size(self):
+        return (self.WIDTH, self.HEIGHT)
+    
+    
+    @property
     def angle(self) -> float:
         return self.body.angle
+    
 
     @property
     def velocity(self) -> Vec2d:
@@ -111,7 +135,7 @@ class Bird():
         return self.body.position + Vec2d(0, -self.HEIGHT / 2).rotated(self.body.angle)
 
     def _create_left_wing(self, space, x_location):
-        self.left_wing = Wing(space, (x_location, self.HEIGHT))
+        self.left_wing = Wing(space, (x_location, self.HEIGHT), LEFT)
         constraint_left = pymunk.PivotJoint(self.body, self.left_wing.body,
                                             (-self.WIDTH / 2 - self.OFFSET, self.HEIGHT / 2), (Wing.WIDTH / 2, 0))
         limit_left = pymunk.RotaryLimitJoint(self.body, self.left_wing.body, -PI / 2, PI)
@@ -119,7 +143,7 @@ class Bird():
         space.add(constraint_left)
 
     def _create_right_wing(self, space, x_location):
-        self.right_wing = Wing(space, (x_location, self.HEIGHT))
+        self.right_wing = Wing(space, (x_location, self.HEIGHT), RIGHT)
         constraint_right = pymunk.PivotJoint(self.body, self.right_wing.body,
                                              (self.WIDTH / 2 + self.OFFSET, self.HEIGHT / 2), (-Wing.WIDTH / 2, 0))
         limit_right = pymunk.RotaryLimitJoint(self.body, self.right_wing.body, -PI, PI / 2)
@@ -164,8 +188,16 @@ class Wing():
     FRICTION = 0.7
     ELASTICITY = 0.2
 
-    def __init__(self, space: pymunk.Space, position: Union[pymunk.vec2d.Vec2d, Tuple[float, float]]) -> None:
+    def __init__(self, space: pymunk.Space, position: Union[pymunk.vec2d.Vec2d, Tuple[float, float]], side:str) -> None:
         self.body = pymunk.Body()
+        self.side = side
+        
+        self.image = pygame.image.load(f'assets/{side}_wing.png')
+        
+        if side == LEFT:
+            self.image = pygame.transform.scale(self.image, (30,15))
+        if side == RIGHT:
+            self.image = pygame.transform.scale(self.image, (28,14))
         self.body.position = position
         self.origin = BodyState(self.body.position, self.body.angle,
                                 self.body.velocity, self.body.angular_velocity)
@@ -176,6 +208,21 @@ class Wing():
         self.shape.friction = self.FRICTION
         self.shape.color = YELLOW
         space.add(self.body, self.shape)
+
+    def render(self, screen,angle_offset):
+        w, h = self.image.get_size()
+        angle = self.angle_deg
+        if self.side == RIGHT:
+
+            blitRotate(screen, self.image, (77,30), (w/8, h/3), angle-angle_offset)
+        else:
+            blitRotate(screen, self.image, (22,30), (6*w/8, h/3), angle-angle_offset)
+
+    @property
+    def angle_deg(self) -> float:
+        return math.degrees(self.body.angle)
+
+
 
     def down(self):
         self.body.apply_force_at_local_point((0, -self.STRENGTH))
