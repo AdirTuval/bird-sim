@@ -161,13 +161,13 @@ class BirdQLearner(GreedyQLearning):
 
     def visualize_learning_result(self, state_key):
         if self.t % 10 == 0:
-            policy = self.get_policy('rd_rd')
+            policy = self.get_policy('rd_ld')
             np.save(f'out/ql_{self.t}.npy', policy)
 
 
 if __name__ == '__main__':
     bird_learner = BirdQLearner()
     bird_learner.set_alpha_value(0.01)
-    bird_learner.learn('rd_ld', 20000)
+    bird_learner.learn('rd_ld', 1000)
     policy = bird_learner.get_policy('rd_ld')
     np.save('out/ql.npy', policy)
