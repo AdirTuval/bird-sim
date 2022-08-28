@@ -267,7 +267,7 @@ class BirdSim():
 if __name__ == '__main__':
     points = {}
     last_height = {}
-    with open('out/ga4_5.npy', 'rb') as f:
+    with open('out/ql_2000.npy', 'rb') as f:
         example_policy = np.load(f)
     BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
     # for i in range(5, 600, 5):

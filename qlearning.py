@@ -1,139 +1,48 @@
 from pyqlearning.qlearning.greedy_q_learning import GreedyQLearning
 import numpy as np
+import argparse
+import simulator
+OUT_PATH = 'out/ql_'
 
 
 class BirdQLearner(GreedyQLearning):
     POLICY_LEN = 60
+    START_STATE = 'rd_ld'
+    ALPHA = 0.01
 
-    def __init__(self):
-        self.states = ['ru_lu', 'ru_li', 'ru_ld', 'ri_lu', 'ri_li', 'ri_ld', 'rd_lu', 'rd_li', 'rd_ld']
-        self.actions = ['ru_lu', 'ru_li', 'ru_ld', 'ri_lu', 'ri_li', 'ri_ld', 'rd_lu', 'rd_li', 'rd_ld']
-        self.rewards = {('ru_lu', 'ru_lu'): -1000,
-                        ('ru_lu', 'ru_li'): -1100,
-                        ('ru_lu', 'ru_ld'): 16000,
-                        ('ru_lu', 'ri_lu'): -1100,
-                        ('ru_lu', 'ri_li'): -1000,
-                        ('ru_lu', 'ri_ld'): 15900,
-                        ('ru_lu', 'rd_lu'): 16000,
-                        ('ru_lu', 'rd_li'): 15900,
-                        ('ru_lu', 'rd_ld'): 32000,
-                        ('ru_li', 'ru_lu'): -1000,
-                        ('ru_li', 'ru_li'): -1100,
-                        ('ru_li', 'ru_ld'): 16000,
-                        ('ru_li', 'ri_lu'): -1100,
-                        ('ru_li', 'ri_li'): -1000,
-                        ('ru_li', 'ri_ld'): 15900,
-                        ('ru_li', 'rd_lu'): 16000,
-                        ('ru_li', 'rd_li'): 15900,
-                        ('ru_li', 'rd_ld'): 32000,
-                        ('ru_ld', 'ru_lu'): -1000,
-                        ('ru_ld', 'ru_li'): -1100,
-                        ('ru_ld', 'ru_ld'): -1000,
-                        ('ru_ld', 'ri_lu'): -1100,
-                        ('ru_ld', 'ri_li'): -1000,
-                        ('ru_ld', 'ri_ld'): -1100,
-                        ('ru_ld', 'rd_lu'): 16000,
-                        ('ru_ld', 'rd_li'): 15900,
-                        ('ru_ld', 'rd_ld'): 16000,
-                        ('ri_lu', 'ru_lu'): -1000,
-                        ('ri_lu', 'ru_li'): -1100,
-                        ('ri_lu', 'ru_ld'): 16000,
-                        ('ri_lu', 'ri_lu'): -1100,
-                        ('ri_lu', 'ri_li'): -1000,
-                        ('ri_lu', 'ri_ld'): 15900,
-                        ('ri_lu', 'rd_lu'): 16000,
-                        ('ri_lu', 'rd_li'): 15900,
-                        ('ri_lu', 'rd_ld'): 32000,
-                        ('ri_li', 'ru_lu'): -1000,
-                        ('ri_li', 'ru_li'): -1100,
-                        ('ri_li', 'ru_ld'): 16000,
-                        ('ri_li', 'ri_lu'): -1100,
-                        ('ri_li', 'ri_li'): -1000,
-                        ('ri_li', 'ri_ld'): 15900,
-                        ('ri_li', 'rd_lu'): 16000,
-                        ('ri_li', 'rd_li'): 15900,
-                        ('ri_li', 'rd_ld'): 32000,
-                        ('ri_ld', 'ru_lu'): -1000,
-                        ('ri_ld', 'ru_li'): -1100,
-                        ('ri_ld', 'ru_ld'): -1000,
-                        ('ri_ld', 'ri_lu'): -1100,
-                        ('ri_ld', 'ri_li'): -1000,
-                        ('ri_ld', 'ri_ld'): -1100,
-                        ('ri_ld', 'rd_lu'): 16000,
-                        ('ri_ld', 'rd_li'): 15900,
-                        ('ri_ld', 'rd_ld'): 32000,
-                        ('rd_lu', 'ru_lu'): -1000,
-                        ('rd_lu', 'ru_li'): -1100,
-                        ('rd_lu', 'ru_ld'): 16000,
-                        ('rd_lu', 'ri_lu'): -1100,
-                        ('rd_lu', 'ri_li'): -1000,
-                        ('rd_lu', 'ri_ld'): 15900,
-                        ('rd_lu', 'rd_lu'): -1000,
-                        ('rd_lu', 'rd_li'): -1100,
-                        ('rd_lu', 'rd_ld'): 16000,
-                        ('rd_li', 'ru_lu'): 0,
-                        ('rd_li', 'ru_li'): -100,
-                        ('rd_li', 'ru_ld'): 0,
-                        ('rd_li', 'ri_lu'): -100,
-                        ('rd_li', 'ri_li'): -1000,
-                        ('rd_li', 'ri_ld'): 15900,
-                        ('rd_li', 'rd_lu'): -100,
-                        ('rd_li', 'rd_li'): -1100,
-                        ('rd_li', 'rd_ld'): 16000,
-                        ('rd_ld', 'ru_lu'): 1000,
-                        ('rd_ld', 'ru_li'): 400,
-                        ('rd_ld', 'ru_ld'): 500,
-                        ('rd_ld', 'ri_lu'): 400,
-                        ('rd_ld', 'ri_li'): -200,
-                        ('rd_ld', 'ri_ld'): -100,
-                        ('rd_ld', 'rd_lu'): 500,
-                        ('rd_ld', 'rd_li'): -200,
-                        ('rd_ld', 'rd_ld'): -100}
-
-    @staticmethod
-    def wing_gain(w_pos_t, w_pos_t_1):
-        if w_pos_t == 0 and w_pos_t_1 == 1:
-            return -1
-        elif w_pos_t == 0 and w_pos_t_1 == 0:
-            return -1
-        elif w_pos_t == 0 and w_pos_t_1 == -1:
-            return -1
-        elif w_pos_t == 1 and w_pos_t_1 == 1:
-            return -1
-        elif w_pos_t == 1 and w_pos_t_1 == 0:
-            return -1
-        elif w_pos_t == 1 and w_pos_t_1 == -1:
-            return 10
-        elif w_pos_t == -1 and w_pos_t_1 == 1:
-            return 10
-        elif w_pos_t == -1 and w_pos_t_1 == 0:
-            return -1
-        elif w_pos_t == -1 and w_pos_t_1 == -1:
-            return -1
+    def __init__(self, gui, save_process, num_iterations, to_visualize):
+        self.states = ['ru_lu',
+                       'ru_li',
+                       'ru_ld',
+                       'ri_lu',
+                       'ri_li',
+                       'ri_ld',
+                       'rd_lu',
+                       'rd_li',
+                       'rd_ld']
+        self.actions = ['ru_lu',
+                        'ru_li',
+                        'ru_ld',
+                        'ri_lu',
+                        'ri_li',
+                        'ri_ld',
+                        'rd_lu',
+                        'rd_li',
+                        'rd_ld']
+        self._gui = gui
+        self._save_process = save_process
+        self._num_iterations = num_iterations
+        self._to_visualize = to_visualize
 
     @staticmethod
     def get_reward(state, action):
-        rt, rt_1 = 0, 0
-        lt, lt_1 = 0, 0
         if action[1] != action[4]:
             return -1
-        if state[1] == 'u':
-            rt = 1
-        elif state[1] == 'd':
-            rt = -1
-        if action[1] == 'u':
-            rt_1 = 1
-        elif action[1] == 'd':
-            rt_1 = -1
-        if state[4] == 'u':
-            rt = 1
-        elif state[4] == 'd':
-            rt = -1
-        if action[4] == 'u':
-            rt_1 = 1
-        elif action[4] == 'd':
-            rt_1 = -1
-        return BirdQLearner.wing_gain(rt, rt_1) + BirdQLearner.wing_gain(lt, lt_1)
+        if state[1] == action[1]:
+            return -1
+        if action[1] == 'i':
+            return -1
+        return 2
 
     def extract_possible_actions(self, state_key):
         return self.actions
@@ -160,14 +69,36 @@ class BirdQLearner(GreedyQLearning):
         return np.array(policy)
 
     def visualize_learning_result(self, state_key):
-        if self.t % 10 == 0:
-            policy = self.get_policy('rd_ld')
-            np.save(f'out/ql_{self.t}.npy', policy)
+        if self.t % self._to_visualize == 0:
+            policy = self.get_policy(self.START_STATE)
+            if self._save_process:
+                np.save(f'{OUT_PATH}{self.t}.npy', policy)
+            if self._gui:
+                bird_sim = simulator.BirdSim()
+                bird_sim.run_simulation_offline(policy,gui=True)
+
+    def run_bird_learner(self, alpha=0.01):
+        self.alpha_value(alpha)
+        self.learn(self.START_STATE, self._num_iterations)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run QLearning and teach Birdy to fly')
+    parser.add_argument('--gui', dest='gui', action='store_true', default=False,
+                        help='activate gui')
+    parser.add_argument('--save_proc', dest='save_proc', action='store_true', default=False,
+                        help='save process')
+    parser.add_argument('--num_iterations', metavar='-n', type=int, nargs='?', default=2000,
+                        help='how many iteration the QLearner should run')
+    parser.add_argument('--to_visualize', metavar='-v', type=int, nargs='?', default=10,
+                        help='visualize current policy evey v iterations')
+    return parser
 
 
 if __name__ == '__main__':
-    bird_learner = BirdQLearner()
-    bird_learner.set_alpha_value(0.01)
-    bird_learner.learn('rd_ld', 2000)
-    policy = bird_learner.get_policy('rd_ld')
-    np.save('out/ql.npy', policy)
+    parser = parse_args()
+    args = parser.parse_args()
+    bird_learner = BirdQLearner(args.gui, args.save_proc, args.num_iterations, args.to_visualize)
+    bird_learner.run_bird_learner()
+
+
