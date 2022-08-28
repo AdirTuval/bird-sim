@@ -264,22 +264,31 @@ class BirdSim():
         return self.bird.y, bird_altitudes
 
 
+def plot_results(algorithm: Tuple[str, int, int, int], file_name: str):
+    altitude = {}
+    for i in range(algorithm[1], algorithm[2], algorithm[3]):
+        with open(f'out/{file_name}_{i}.npy', 'rb') as f:
+            example_policy = np.load(f)
+        altitude[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.scatter(altitude.keys(), altitude.values(), alpha=0.7, c='indianred', marker="o")
+    ax1.set_title(f'Altitude of Birdy during learning with {algorithm[0]}')
+    ax1.set_xlabel('Generation')
+    ax1.set_ylabel('Altitude')
+    plt.show()
+
+
+def main(plot_res, genetic: Tuple[str, int, int, int] = None,
+         qlearning: Tuple[str, int, int, int] = None):
+    if plot_res:
+        if genetic:
+            plot_results(genetic, 'ga4')
+        if qlearning:
+            plot_results(qlearning, 'ql')
+
+
 if __name__ == '__main__':
-    points = {}
-    last_height = {}
-    with open('out/ql_2000.npy', 'rb') as f:
-        example_policy = np.load(f)
-    BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
-    # for i in range(5, 600, 5):
-    #     with open('out/ga3_' + str(i) + '.npy', 'rb') as f:
-    #         example_policy = np.load(f)
-    #     points[i] = max(BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[1])
-    #     last_height[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
-    #     # print("for state [" + str(i) + "], last height=" +str(last_height[i]))
-    #     # print()
-    # fig = plt.figure()
-    # ax1 = fig.add_subplot(111)
-    # ax1.scatter(points.keys(), points.values(), s=10, c='b', marker="s", label='max height')
-    # ax1.scatter(last_height.keys(), last_height.values(), s=10, c='r', marker="o", label='last height')
-    # plt.legend(loc='upper left')
-    # plt.show()
+    main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
+
+

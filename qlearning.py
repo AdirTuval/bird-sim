@@ -77,8 +77,8 @@ class BirdQLearner(GreedyQLearning):
                 bird_sim = simulator.BirdSim()
                 bird_sim.run_simulation_offline(policy,gui=True)
 
-    def run_bird_learner(self, alpha=0.01):
-        self.alpha_value(alpha)
+    def run_bird_learner(self, alpha=0.005):
+        self.alpha_value = alpha
         self.learn(self.START_STATE, self._num_iterations)
 
 
