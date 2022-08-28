@@ -74,7 +74,7 @@ class BirdQLearner(GreedyQLearning):
             if self._save_process:
                 np.save(f'{OUT_PATH}{self.t}.npy', policy)
             if self._gui:
-                bird_sim = simulator.BirdSim()
+                bird_sim = simulator.BirdSim(gui=True)
                 bird_sim.run_simulation_offline(policy,gui=True)
 
     def run_bird_learner(self, alpha=0.005):

@@ -73,7 +73,7 @@ class GeneticAlgo():
             if GeneticAlgo.SAVE_PROC:
                 GeneticAlgo.save_results(policy, ga_instance.generations_completed)
             if GeneticAlgo.GUI:
-                bird_sim = BirdSim()
+                bird_sim = BirdSim(gui=True)
                 bird_sim.run_simulation_offline(policy, gui=True)
 
     def run(self) -> Tuple[Any, None, Any]:
