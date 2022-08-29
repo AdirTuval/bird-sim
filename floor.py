@@ -24,4 +24,4 @@ class Floor():
 
         screen_width, screen_hight = screen.get_size()
         image_to_display = pygame.transform.scale(self.image, (screen_width, screen_hight/2 ))
-        screen.blit(image_to_display, (0,400 + bird_hight-60))
+        screen.blit(image_to_display, (0,376 + bird_hight))
