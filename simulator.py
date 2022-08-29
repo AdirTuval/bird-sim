@@ -293,7 +293,7 @@ def main(plot_res, genetic: Tuple[str, int, int, int] = None,
          qlearning: Tuple[str, int, int, int] = None):
     if plot_res:
         if genetic:
-            plot_results(genetic, 'ga4')
+            plot_results(genetic, 'ga')
         if qlearning:
             plot_results(qlearning, 'ql')
 

@@ -47,9 +47,9 @@ class GeneticAlgo():
                              'mutation_percent_genes': mutation_percent_genes,
                              'callback_generation': callback_generation if callback_generation else self.callback_gen,
                              'parallel_processing': parallel_processing}
-        self.GUI = gui
-        self.SAVE_PROC = save_proc,
-        self.TO_VISUALIZE = to_visualize
+        GeneticAlgo.GUI = gui
+        GeneticAlgo.SAVE_PROC = save_proc,
+        GeneticAlgo.TO_VISUALIZE = to_visualize
 
     @staticmethod
     def fitness_func(solution: np.ndarray, solutions_index) -> float:
