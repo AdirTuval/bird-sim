@@ -300,4 +300,7 @@ def main(plot_res, genetic: Tuple[str, int, int, int] = None,
 
 if __name__ == '__main__':
     # main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
-    BirdSim(gui=True, debug=True).run_simulation_interactive()
+    BirdSim(gui=True, debug=False).run_simulation_interactive()
+    # with open('out/ga4_95.npy', 'rb') as f:
+    #     example_policy = np.load(f)
+    # bird_sim = BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True)
