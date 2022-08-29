@@ -32,14 +32,14 @@ class BirdSim():
     DT = 1 / FPS
     GRAVITY = -1000
 
-    def __init__(self, *, gui: bool = False):
+    def __init__(self, *, gui: bool = False, debug: bool = False):
         # pymunk physics simulator
         self.space = pymunk.Space(threaded=True)
         self.space.threads = 2
         self.space.gravity = 0, GRAVITY
         self.bird = Bird(self.space, self.WIDTH / 2)
         self.floor = Floor(self.space, self.WIDTH)
-
+        self.debug = debug
         # gui
         self.gui = gui
         if self.gui:
@@ -188,12 +188,13 @@ class BirdSim():
                     self.bird.re_origin()
 
             self.zoom.update()
-            # self.space.debug_draw(self.gui_controller)
             
-            bird_height = pygame.font.Font(None, 16).render(str(f'{self.bird.y:.3f}'), True, pygame.Color("red"))
-            bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
+            if self.debug:
+                bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
+                self.window.blit(bird_angle,(5,40))
+                self.space.debug_draw(self.gui_controller)
 
-            self.window.blit(bird_angle,(5,40))
+            bird_height = pygame.font.Font(None, 20).render(str(f'Altitude: {self.bird.y:.0f}'), True, pygame.Color("red"))
             self.window.blit(self.text, (5, 5))
             self.window.blit(bird_height, (5, 20))
             pygame.display.update()
@@ -231,6 +232,9 @@ class BirdSim():
                 self.window.fill((0, 0, 0))
                 self.bg.update(self.bird.position)
                 self.bg.render()
+                self.floor.render(self.window, self.bird.y)
+                self.bird.render(self.window)
+
 
             self.apply_drag_force(self.bird.body)
 
@@ -250,8 +254,11 @@ class BirdSim():
 
             if gui and self.gui:
                 self.zoom.update()
-                self.space.debug_draw(self.gui_controller)
-                bird_height = pygame.font.Font(None, 16).render(f"{self.bird.y:.3f}", True, pygame.Color("red"))
+                if self.debug:
+                    bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
+                    self.window.blit(bird_angle,(5,40))
+                    self.space.debug_draw(self.gui_controller)
+                bird_height = pygame.font.Font(None, 16).render(f"Altitude: {self.bird.y:.0f}", True, pygame.Color("red"))
                 self.window.blit(self.text, (5, 5))
                 self.window.blit(bird_height, (5, 20))
                 pygame.display.update()
@@ -265,8 +272,9 @@ class BirdSim():
 
 
 if __name__ == '__main__':
-    points = {}
-    last_height = {}
+    # BirdSim(gui=True,debug=True).run_simulation_interactive()
+    # points = {}
+    # last_height = {}
     with open('out/ga4_5.npy', 'rb') as f:
         example_policy = np.load(f)
     BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)
