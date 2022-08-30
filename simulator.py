@@ -1,4 +1,5 @@
 import datetime
+import os
 import sys
 from collections import namedtuple
 from typing import Tuple, Sequence
@@ -209,7 +210,7 @@ class BirdSim():
         pygame.quit()
     def save_capture(self, surface):
         pygame.image.save(surface, 'captures/'+f'capture_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
-    def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False) -> Tuple[float, Sequence[float]]:
+    def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False, vid_dir_out=None) -> Tuple[float, Sequence[float]]:
         """
         Run simulation for TRAIN_TIME_SEC seconds and return the result
 
@@ -265,7 +266,10 @@ class BirdSim():
                 self.window.blit(self.text, (5, 5))
                 self.window.blit(bird_height, (5, 20))
                 pygame.display.update()
-
+                if vid_dir_out is not None:
+                    filename = f"{vid_dir_out}/{i//2+i%2:04d}.png"
+                    pygame.image.save(self.window, filename)
+            
             self.space.step(self.DT)
 
             if gui and self.gui:
@@ -300,7 +304,12 @@ def main(plot_res, genetic: Tuple[str, int, int, int] = None,
 
 if __name__ == '__main__':
     # main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
-    BirdSim(gui=True, debug=False).run_simulation_interactive()
-    # with open('out/ga4_95.npy', 'rb') as f:
-    #     example_policy = np.load(f)
-    # bird_sim = BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True)
+    # BirdSim(gui=True, debug=False).run_simulation_interactive()
+    policy_name = "ga4_95"
+    with open(f'out/{policy_name}.npy', 'rb') as f:
+        example_policy = np.load(f)
+    out_path = f'vid_as_im/{policy_name}'
+    os.makedirs(out_path,exist_ok=True)
+    # BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True, vid_dir_out =out_path)
+    os.system(f"avconv -r 24 -f image2 -i vid_as_im/{policy_name}/%04d.png -y -qscale 0  -s 800x600 -aspect 4:3 vids/{policy_name}.avi")
+    
