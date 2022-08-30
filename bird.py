@@ -66,7 +66,7 @@ class Bird():
     FRICTION = 0.8
 
     def __init__(self, space: pymunk.Space, x_location: float) -> None:
-        self.image = pygame.image.load('assets/body.png')
+        self.image = pygame.image.load('assets/body_jeff.png')
         self.image = pygame.transform.scale(self.image, (self.IMAGE_SIZE, self.IMAGE_SIZE))
         self.body = pymunk.Body()
         self.body.position = x_location, self.HEIGHT / 2

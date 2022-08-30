@@ -1,3 +1,4 @@
+import datetime
 import sys
 from collections import namedtuple
 from typing import Tuple, Sequence
@@ -133,9 +134,9 @@ class BirdSim():
         prev_v_right = Vec2d(0, 0)
         lift_left = Vec2d(0, 0)
         lift_right = Vec2d(0, 0)
-
+        save_capture = False
         while running:
-            self.window.fill((0, 0, 0))
+            self.window.fill((200, 200, 255))
             self.bg.update(self.bird.position)
             self.bg.render()
             self.floor.render(self.window, self.bird.y)
@@ -181,14 +182,13 @@ class BirdSim():
                 ):
                     running = False
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                    pygame.image.save(self.window, "bird_capture.png")
+                    save_capture = True
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     run_physics = not run_physics
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     self.bird.re_origin()
 
             self.zoom.update()
-            
             if self.debug:
                 bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
                 self.window.blit(bird_angle,(5,40))
@@ -198,14 +198,17 @@ class BirdSim():
             self.window.blit(self.text, (5, 5))
             self.window.blit(bird_height, (5, 20))
             pygame.display.update()
-
+            if save_capture:
+                self.save_capture(self.window)
+                save_capture = False
             if run_physics:
                 self.space.step(self.DT)
 
             self.clock.tick(self.FPS)
 
         pygame.quit()
-
+    def save_capture(self, surface):
+        pygame.image.save(surface, 'captures/'+f'capture_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
     def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False) -> Tuple[float, Sequence[float]]:
         """
         Run simulation for TRAIN_TIME_SEC seconds and return the result
@@ -296,6 +299,8 @@ def main(plot_res, genetic: Tuple[str, int, int, int] = None,
 
 
 if __name__ == '__main__':
-    main(True, ('Genetic Algorithm', 5, 600, 5), ('QLearning', 10, 2000, 10))
-
-
+    # main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
+    BirdSim(gui=True, debug=False).run_simulation_interactive()
+    # with open('out/ga4_95.npy', 'rb') as f:
+    #     example_policy = np.load(f)
+    # bird_sim = BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True)
