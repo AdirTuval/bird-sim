@@ -276,7 +276,7 @@ def plot_results(algorithm: Tuple[str, int, int, int], file_name: str):
     for i in range(algorithm[1], algorithm[2], algorithm[3]):
         with open(f'out/{file_name}_{i}.npy', 'rb') as f:
             example_policy = np.load(f)
-        altitude[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
+        altitude[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)[0]
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.scatter(altitude.keys(), altitude.values(), alpha=0.7, c='indianred', marker="o")
