@@ -279,7 +279,7 @@ def plot_results(algorithm: Tuple[str, int, int, int], file_name: str):
     for i in range(algorithm[1], algorithm[2], algorithm[3]):
         with open(f'out/{file_name}_{i}.npy', 'rb') as f:
             example_policy = np.load(f)
-        altitude[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=True)[0]
+        altitude[i] = BirdSim(gui=True).run_simulation_offline(policy=example_policy, gui=False)[0]
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.scatter(altitude.keys(), altitude.values(), alpha=0.7, c='indianred', marker="o")
@@ -299,8 +299,9 @@ def main(plot_res, genetic: Tuple[str, int, int, int] = None,
 
 
 if __name__ == '__main__':
-    # main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
-    BirdSim(gui=True, debug=False).run_simulation_interactive()
-    # with open('out/ga4_95.npy', 'rb') as f:
-    #     example_policy = np.load(f)
-    # bird_sim = BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True)
+    # main(True, ('Genetic Algorithm', 5, 600, 5), ('QLearning', 10, 400, 10))
+    # BirdSim(gui=True, debug=False).run_simulation_interactive()
+    with open('out/ql_2000.npy', 'rb') as f:
+        example_policy = np.load(f)
+        print(example_policy)
+    bird_sim = BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True)
