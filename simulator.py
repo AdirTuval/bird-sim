@@ -1,24 +1,20 @@
 import datetime
-import os
-import sys
-from collections import namedtuple
 from typing import Tuple, Sequence
 import logging
 
-import numpy as np
 from os import environ
+
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
 import pymunk
-import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt
 from pymunk import pygame_util, Vec2d
-from camera import Camera
+from utils.camera import Camera
 from bird import Bird, BirdState
-from floor import Floor
-from background import Background
-from constants import *
+from utils.floor import Floor
+from utils.background import Background
+from utils.constants import *
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +25,9 @@ debug_draw_drag_force = False
 
 
 class BirdSim():
+    """
+    Simulates the flight of Bird offline - given a policy, online - Human Player
+    """
     WIDTH, HEIGHT = 800, 600
     FPS = 60
     DT = 1 / FPS
@@ -54,13 +53,18 @@ class BirdSim():
             self.zoom = Camera(self.gui_controller, self.bird, self.WIDTH, self.HEIGHT)
             self.text = pygame.font.Font(None, 16).render(HELP_TEXT, True, pygame.Color("black"))
 
-    @classmethod
-    def translate_coords(cls, v):
-        return v[0], cls.HEIGHT - v[1]
-
     @staticmethod
     def int_point(p):
         return int(p[0]), int(p[1])
+
+    @staticmethod
+    def lift(m: float, dt: float, dv: Vec2d):
+        down_force = m / dt * dv
+        return -down_force
+
+    @classmethod
+    def translate_coords(cls, v):
+        return v[0], cls.HEIGHT - v[1]
 
     def draw_dv(self, dv_left: Vec2d, dv_right: Vec2d):
         pygame.draw.line(self.window, BLACK,
@@ -82,11 +86,6 @@ class BirdSim():
         pygame.draw.line(self.window, WHITE,
                          pygame_util.to_pygame(applied_point, self.window),
                          pygame_util.to_pygame(applied_point + drag_force, self.window), 10)
-
-    @staticmethod
-    def lift(m: float, dt: float, dv: Vec2d):
-        down_force = m / dt * dv
-        return -down_force
 
     def apply_drag_force(self, body: pymunk.Body, *, drag_coeff: float = DRAG_COEFFICIENT) -> Tuple[Vec2d, Vec2d]:
         pointing_direction = Vec2d(1, 0).rotated(body.angle)
@@ -119,6 +118,9 @@ class BirdSim():
         return self.bird.get_state()
 
     def run_simulation_interactive(self):
+        """
+        Human player mode
+        """
         if not self.gui \
                 and hasattr(self, 'window') \
                 and hasattr(self, 'bg') \
@@ -191,11 +193,14 @@ class BirdSim():
 
             self.zoom.update()
             if self.debug:
-                bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
-                self.window.blit(bird_angle,(5,40))
+                bird_angle = pygame.font.Font(None, 30).render(str(
+                    f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'),
+                    True, pygame.Color("black"))
+                self.window.blit(bird_angle, (5, 40))
                 self.space.debug_draw(self.gui_controller)
 
-            bird_height = pygame.font.Font(None, 20).render(str(f'Altitude: {self.bird.y:.0f}'), True, pygame.Color("red"))
+            bird_height = pygame.font.Font(None, 20).render(str(f'Altitude: {self.bird.y:.0f}'), True,
+                                                            pygame.Color("red"))
             self.window.blit(self.text, (5, 5))
             self.window.blit(bird_height, (5, 20))
             pygame.display.update()
@@ -208,9 +213,12 @@ class BirdSim():
             self.clock.tick(self.FPS)
 
         pygame.quit()
+
     def save_capture(self, surface):
-        pygame.image.save(surface, 'captures/'+f'capture_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
-    def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False, vid_dir_out=None) -> Tuple[float, Sequence[float]]:
+        pygame.image.save(surface, 'captures/' + f'capture_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.png')
+
+    def run_simulation_offline(self, policy: np.ndarray, *, gui: bool = False, vid_dir_out=None) -> Tuple[
+        float, Sequence[float]]:
         """
         Run simulation for TRAIN_TIME_SEC seconds and return the result
 
@@ -227,7 +235,8 @@ class BirdSim():
                 raise AttributeError(f"policy must be at length of {POLICY_LEN}")
 
         if gui and not self.gui:
-            logger.warning("simulation was set to run with gui, but simulator was not instantiated with gui. Continue without gui")
+            logger.warning(
+                "simulation was set to run with gui, but simulator was not instantiated with gui. Continue without gui")
 
         bird_altitudes = []
 
@@ -238,7 +247,6 @@ class BirdSim():
                 self.bg.render()
                 self.floor.render(self.window, self.bird.y)
                 self.bird.render(self.window)
-
 
             self.apply_drag_force(self.bird.body)
 
@@ -259,17 +267,20 @@ class BirdSim():
             if gui and self.gui:
                 self.zoom.update()
                 if self.debug:
-                    bird_angle = pygame.font.Font(None, 30).render(str(f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'), True, pygame.Color("black"))
-                    self.window.blit(bird_angle,(5,40))
+                    bird_angle = pygame.font.Font(None, 30).render(str(
+                        f'{self.bird.angle_deg:.0f},{self.bird.right_wing.angle_deg:.0f},{self.bird.left_wing.angle_deg:.0f}'),
+                        True, pygame.Color("black"))
+                    self.window.blit(bird_angle, (5, 40))
                     self.space.debug_draw(self.gui_controller)
-                bird_height = pygame.font.Font(None, 16).render(f"Altitude: {self.bird.y:.0f}", True, pygame.Color("red"))
+                bird_height = pygame.font.Font(None, 16).render(f"Altitude: {self.bird.y:.0f}", True,
+                                                                pygame.Color("red"))
                 self.window.blit(self.text, (5, 5))
                 self.window.blit(bird_height, (5, 20))
                 pygame.display.update()
                 if vid_dir_out is not None:
-                    filename = f"{vid_dir_out}/{i//2+i%2:04d}.png"
+                    filename = f"{vid_dir_out}/{i // 2 + i % 2:04d}.png"
                     pygame.image.save(self.window, filename)
-            
+
             self.space.step(self.DT)
 
             if gui and self.gui:
@@ -291,24 +302,3 @@ def plot_results(algorithm: Tuple[str, int, int, int], file_name: str):
     ax1.set_xlabel('Generation')
     ax1.set_ylabel('Altitude')
     plt.show()
-
-
-def main(plot_res, genetic: Tuple[str, int, int, int] = None,
-         qlearning: Tuple[str, int, int, int] = None):
-    if plot_res:
-        if genetic:
-            plot_results(genetic, 'ga')
-        if qlearning:
-            plot_results(qlearning, 'ql')
-
-
-if __name__ == '__main__':
-    # main(True, ('Genetic Algorithm', 5, 100, 5), ('QLearning', 10, 2000, 10))
-    # BirdSim(gui=True, debug=False).run_simulation_interactive()
-    policy_name = "ga4_95"
-    with open(f'out/{policy_name}.npy', 'rb') as f:
-        example_policy = np.load(f)
-    out_path = f'vid_as_im/{policy_name}'
-    os.makedirs(out_path,exist_ok=True)
-    # BirdSim(gui=True, debug=False).run_simulation_offline(policy=example_policy, gui=True, vid_dir_out =out_path)
-    os.system(f"avconv -r 24 -f image2 -i vid_as_im/{policy_name}/%04d.png -y -qscale 0  -s 800x600 -aspect 4:3 vids/{policy_name}.avi")

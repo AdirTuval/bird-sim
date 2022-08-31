@@ -9,7 +9,7 @@ class Background():
     i = 0
     def __init__(self, displaySurf):
         self.displaySurf = displaySurf
-        self.bgimage = pygame.image.load('assets/bg.jfif')
+        self.bgimage = pygame.image.load('../assets/bg.jfif')
         self.rectBGimg = self.bgimage.get_rect()
         self.rects_to_draw = []
 

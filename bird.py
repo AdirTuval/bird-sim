@@ -1,11 +1,9 @@
-import imp
-from turtle import right
 from typing import Union, Tuple
 import pymunk
 from pymunk import Vec2d
 import pygame
-from constants import *
-from draw_blits import blitRotate
+from utils.constants import *
+from utils.draw_blits import blitRotate
 import math 
 # BodyState = namedtuple('BodyState', 'position angle velocity angular_velocity')
 LEFT = 'left'

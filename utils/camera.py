@@ -1,7 +1,7 @@
 import pygame
 import pymunk.pygame_util
 import pymunk
-from constants import *
+from utils.constants import *
 
 class Camera:
     def __init__(self, draw_options, bird, width, height ):

@@ -1,5 +1,5 @@
 import pymunk
-from constants import *
+from utils.constants import *
 import pygame
 
 
@@ -11,7 +11,7 @@ class Floor():
     AREA_FACTOR = 100
 
     def __init__(self, space, space_width) -> None:
-        self.image = pygame.image.load('assets/floor.jpg')
+        self.image = pygame.image.load('../assets/floor.jpg')
         self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
         self.body.position = space_width / 2, -self.HEIGHT/2
         self.shape = pymunk.Poly.create_box(self.body, (space_width * self.AREA_FACTOR, self.HEIGHT))

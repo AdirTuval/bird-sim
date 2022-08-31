@@ -13,6 +13,7 @@ import numpy as np
 
 from simulator import BirdSim
 from genetic_algorithm import GeneticAlgo
+from qlearning import BirdQLearner
 
 logger = logging.getLogger(__name__)
 
@@ -38,21 +39,15 @@ def main_play(args: argparse.Namespace) -> None:
 
 
 def main_train(args: argparse.Namespace) -> None:
-    if not _is_valid_output(args.output):
-        raise NotADirectoryError(f"Failed to locate the directory for output file: '{args.output}'")
-
     if args.algorithm == 'GA':
-        ga_runner = GeneticAlgo()
+        ga_runner = GeneticAlgo(gui=args.gui, save_proc=args.save_proc, to_visualize=args.to_visualize,
+                                num_generations=args.num_generations, num_parents_mating=args.num_parents_mating,
+                                sol_per_pop=args.sol_per_pop)
+        ga_runner.run()
 
-        if args.cpu:
-            ga_runner.params['parallel_processing'] = ('process', args.cpu)
-        if args.generations:
-            ga_runner.params['num_generations'] = args.generations
-
-        ga_runner.run(args.output)
-
-    elif args.algorithm == 'RL':
-        pass  # TODO: add RL algo training
+    elif args.algorithm == 'QL':
+        ql_runner = BirdQLearner(args.gui, args.save_proc, args.num_iterations, args.to_visualize)
+        ql_runner.run_bird_learner()
 
 
 def main_policy(args: argparse.Namespace) -> None:
@@ -64,7 +59,6 @@ def main_policy(args: argparse.Namespace) -> None:
     policy = np.load(args.input_file)
 
     bird_sim.run_simulation_offline(policy, gui=True)
-
 
 
 def _is_valid_file(file_path: str) -> bool:
@@ -99,17 +93,31 @@ def arguments_parser() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(prog=PROGRAM_NAME, description=TITLE + '\n' + DESCRIPTION, epilog=EPILOG,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('-v', '--version', action="version", version=f'{PROGRAM_NAME.title()} {VERSION}')
-    parser.add_argument('-l', '--loglevel', type=str, action="store", default='info', help="set logging level")
+    parser.add_argument('--version', action="version", version=f'{PROGRAM_NAME.title()} {VERSION}')
+    parser.add_argument('--loglevel', type=str, action="store", default='info', help="set logging level")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # parser for training the bird agent
     parser_train = subparsers.add_parser('train', help="train the bird")
-    parser_train.add_argument('-a', '--algorithm', type=str, choices=['GA', 'RL'], action='store', help='algorithm to use for training', required=True)
-    parser_train.add_argument('-o', '--output', type=str, action='store', help='write output policy to <file> path',
-                              metavar='<file>', required=True)
-    parser_train.add_argument('--cpu', type=int, choices=list(range(1, os.cpu_count())), action='store', help='number of parallel processes to use')
-    parser_train.add_argument('-g', '--generations', type=int, action='store', help='number of generations', default=300)
+
+    parser_train.add_argument('--gui', '-g', action='store_true', default=False,
+                              help='activate gui {default=False}')
+    parser_train.add_argument('--save_proc', '-o', action='store_true', default=False,
+                              help='save process {default=False}')
+    parser_train.add_argument('--to_visualize', '-v', type=int, nargs='?', default=10,
+                              help='visualize current policy every v iterations {default=10}')
+
+    train_subparsers = parser_train.add_subparsers(dest='algorithm', required=True)
+
+    genetic_parser = train_subparsers.add_parser('GA', help='train using Genetic Algorithm')
+    genetic_parser.add_argument('--num_generations', '-n', type=int, nargs='?', default=600,
+                                help='how many generations the QLearner should run {default=600}')
+    genetic_parser.add_argument('--sol_per_pop', '-s', type=int, nargs='?', default=2000,
+                                help='size of the population in each generation {default=2000}')
+    genetic_parser.add_argument('--num_parents_mating', '-p', type=int, nargs='?', default=50,
+                                help='num of parents mating in each generation {default=50}')
+    qlearning_parser = train_subparsers.add_parser('QL', help='train using QLearning algorithm')
+    qlearning_parser.add_argument('--num_iterations', '-i', type=int, nargs='?', default=2000,
+                                  help='how many iteration the QLearner should run {default=2000}')
     parser_train.set_defaults(func=main_train)
 
     # parser for GUI

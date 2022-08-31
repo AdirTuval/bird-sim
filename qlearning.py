@@ -6,6 +6,9 @@ OUT_PATH = 'out/ql_'
 
 
 class BirdQLearner(GreedyQLearning):
+    """
+    Train Bird to fly using QLearning Algorithm
+    """
     POLICY_LEN = 60
     START_STATE = 'rd_ld'
     ALPHA = 0.01
@@ -36,6 +39,9 @@ class BirdQLearner(GreedyQLearning):
 
     @staticmethod
     def get_reward(state, action):
+        """
+        Given a state and an action returns the reward of doing that action from that state
+        """
         if action[1] != action[4]:
             return -1
         if state[1] == action[1]:
@@ -51,6 +57,9 @@ class BirdQLearner(GreedyQLearning):
         return self.get_reward(state_key, action_key)
 
     def get_policy(self, state_key):
+        """
+        Given a state start key reutn a policy in the current pose of the QValues table
+        """
         policy = []
         for i in range(BirdQLearner.POLICY_LEN):
             actions = self.extract_possible_actions(state_key)
@@ -69,6 +78,9 @@ class BirdQLearner(GreedyQLearning):
         return np.array(policy)
 
     def visualize_learning_result(self, state_key):
+        """
+        If defined, show and save the learning process
+        """
         if self.t % self._to_visualize == 0:
             policy = self.get_policy(self.START_STATE)
             if self._save_process:
@@ -78,6 +90,9 @@ class BirdQLearner(GreedyQLearning):
                 bird_sim.run_simulation_offline(policy,gui=True)
 
     def run_bird_learner(self, alpha=0.005):
+        """
+        Runs the learning process
+        """
         self.alpha_value = alpha
         self.learn(self.START_STATE, self._num_iterations)
 
