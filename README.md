@@ -1,20 +1,21 @@
 # Bird Simulator
-* simulator.py - Simulating the flight of the bird, given a policy or human player.
 
-* bird.py - Configures a Bird object.
+* `simulator.py` - Simulating the flight of the bird, given a policy or human player.
 
-* genetic_algorithm.py - Train Bird to fly as high a possible using Genetic Algorithm.
+* `bird.py` - Configures a Bird object.
 
-* qlearning.py - Train Bird to fly as high a possible using QLearning Algorithm.
+* `genetic_algorithm.py` - Train Bird to fly as high a possible using Genetic Algorithm.
+
+* `qlearning.py` - Train Bird to fly as high a possible using QLearning Algorithm.
 
 ## Install Requirements:
-````
-pip install -r requirments.txt
-````
+```bash
+pip3 install -r requirments.txt
+```
 
 ## CLI Manual
-````
-python cli.py --help
+```
+python3 cli.py --help
 ______ _         _   _____ _
 | ___ (_)       | | /  ___(_)
 | |_/ /_ _ __ __| | \ `--. _ _ __ ___
@@ -63,5 +64,6 @@ positional arguments:
 
 optional arguments:
   -h, --help     show this help message and exit
-````
-* Saved results of the algorithms can be found under 'out' dir
+```
+
+* Saved results of the algorithms can be found under `out` dir
